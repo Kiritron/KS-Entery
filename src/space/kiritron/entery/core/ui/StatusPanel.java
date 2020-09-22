@@ -47,9 +47,9 @@ public class StatusPanel extends JPanel {
         add(Box.createVerticalStrut(21));
 
         JButton pip = new JButton("Картинка в картинке");
-        pip.setToolTipText("Функция, которая переносит видео-плеер в отдельное плавающее окно.\n" +
-                            "Нажмите, если на сайте есть видео-плеер, который вы бы хотели перенести\n" +
-                            "в отдельное окно. Пример таких сайтов: YouTube, онлайн-кинотеатры.");
+        //pip.setToolTipText("Функция, которая переносит видео-плеер в отдельное плавающее окно.\n" +
+        //                    "Нажмите, если на сайте есть видео-плеер, который вы бы хотели перенести\n" +
+        //                    "в отдельное окно. Пример таких сайтов: YouTube, онлайн-кинотеатры.");
         pip.setFont(new Font("Dialog", Font.PLAIN, 13));
         pip.setFocusable(false);
         pip.setAlignmentX(CENTER_ALIGNMENT);
