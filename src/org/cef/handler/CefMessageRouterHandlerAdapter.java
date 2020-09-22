@@ -1,0 +1,28 @@
+// Copyright (c) 2014 The Chromium Embedded Framework Authors. All rights reserved.
+// Copyright (c) 2020 Киритрон Стэйблкор.
+
+package org.cef.handler;
+
+import org.cef.browser.CefBrowser;
+import org.cef.browser.CefFrame;
+import org.cef.callback.CefNativeAdapter;
+import org.cef.callback.CefQueryCallback;
+
+/**
+ * An abstract adapter class for receiving message router events.
+ * The methods in this class are empty.
+ * This class exists as convenience for creating handler objects.
+ */
+public abstract class CefMessageRouterHandlerAdapter
+        extends CefNativeAdapter implements CefMessageRouterHandler {
+    @Override
+    public boolean onQuery(CefBrowser browser, CefFrame frame, long queryId, String request,
+            boolean persistent, CefQueryCallback callback) {
+        return false;
+    }
+
+    @Override
+    public void onQueryCanceled(CefBrowser browser, CefFrame frame, long queryId) {
+        return;
+    }
+}
