@@ -146,13 +146,13 @@ public class CefApp extends CefAppHandlerAdapter {
 
         if (OS.isWindows()) {
             SystemBootstrap.loadLibrary("jawt");
-            SystemBootstrap.loadLibrary("chrome_elf");
-            SystemBootstrap.loadLibrary("libcef");
+            System.load(GetPathOfAPP.GetPathWithSep() + "lib" + GetPathOfAPP.GetSep() + "win64" + GetPathOfAPP.GetSep() + "chrome_elf.dll");
+            System.load(GetPathOfAPP.GetPathWithSep() + "lib" + GetPathOfAPP.GetSep() + "win64" + GetPathOfAPP.GetSep() + "libcef.dll");
 
             // Other platforms load this library in CefApp.startup().
-            SystemBootstrap.loadLibrary("jcef");
+            System.load(GetPathOfAPP.GetPathWithSep() + "lib" + GetPathOfAPP.GetSep() + "win64" + GetPathOfAPP.GetSep() + "jcef.dll");
         } else if (OS.isLinux()) {
-            SystemBootstrap.loadLibrary("cef");
+            System.load(GetPathOfAPP.GetPathWithSep() + "lib" + GetPathOfAPP.GetSep() + "win64" + GetPathOfAPP.GetSep() + "cef.so");
         }
         if (appHandler_ == null) {
             appHandler_ = this;
@@ -548,20 +548,15 @@ public class CefApp extends CefAppHandlerAdapter {
      * @return The path to the jcef library
      */
     private static final String getJcefLibPath() {
-        String library_path = System.getProperty("java.library.path");
-        String[] paths = library_path.split(System.getProperty("path.separator"));
-        for (String path : paths) {
-            File dir = new File(path);
-            String[] found = dir.list(new FilenameFilter() {
-                @Override
-                public boolean accept(File dir, String name) {
-                    return (name.equalsIgnoreCase("libjcef.dylib")
-                            || name.equalsIgnoreCase("libjcef.so")
-                            || name.equalsIgnoreCase("jcef.dll"));
-                }
-            });
-            if (found != null && found.length != 0) return path;
+        String library_path;
+        if (OS.isWindows()) {
+            library_path = GetPathOfAPP.GetPathWithSep() + "lib" + GetPathOfAPP.GetSep() + "win64" + GetPathOfAPP.GetSep();
+        } else if (OS.isLinux()) {
+            library_path = GetPathOfAPP.GetPathWithSep() + "lib" + GetPathOfAPP.GetSep() + "linux64" + GetPathOfAPP.GetSep();
+        } else {
+            library_path = null;
         }
+
         return library_path;
     }
 
