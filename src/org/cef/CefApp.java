@@ -548,11 +548,9 @@ public class CefApp extends CefAppHandlerAdapter {
      * @return The path to the jcef library
      */
     private static final String getJcefLibPath() {
-        // Киритрон Стэйблкор: Меняем адрес директории на свой, так как меняться конфигурациями он не будет.
-        String library_path = GetPathOfAPP.GetPathWithSep() + "lib" + GetPathOfAPP.GetSep() + "win64";
-        //System.getProperty("java.library.path");
-        //String[] paths = library_path.split(System.getProperty("path.separator"));
-        /*for (String library_path) {
+        String library_path = System.getProperty("java.library.path");
+        String[] paths = library_path.split(System.getProperty("path.separator"));
+        for (String path : paths) {
             File dir = new File(path);
             String[] found = dir.list(new FilenameFilter() {
                 @Override
@@ -563,7 +561,7 @@ public class CefApp extends CefAppHandlerAdapter {
                 }
             });
             if (found != null && found.length != 0) return path;
-        }*/
+        }
         return library_path;
     }
 
