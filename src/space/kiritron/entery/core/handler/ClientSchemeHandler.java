@@ -13,6 +13,10 @@ import org.cef.misc.IntRef;
 import org.cef.misc.StringRef;
 import org.cef.network.CefRequest;
 import org.cef.network.CefResponse;
+import space.kiritron.entery.init;
+import space.kiritron.entery.ks_libs.pixel.GetOS;
+
+import static space.kiritron.entery.init.VER_APP;
 
 public class ClientSchemeHandler extends CefResourceHandlerAdapter {
     public static final String scheme = "entery";
@@ -30,30 +34,76 @@ public class ClientSchemeHandler extends CefResourceHandlerAdapter {
     public synchronized boolean processRequest(CefRequest request, CefCallback callback) {
         boolean handled = false;
         String url = request.getURL();
-        if (url.indexOf("handler.html") != -1) {
-            // Build the response html
+        if (url.indexOf("empty") != -1) {
             String html;
-            html = "<html><head><title>Client Scheme Handler</title></head>"
-                    + "<body bgcolor=\"white\">"
-                    + "This contents of this page page are served by the "
-                    + "ClientSchemeHandler class handling the client:// protocol."
-                    + "<br/>You should see an image:"
-                    + "<br/><img src=\"entery://res/logo.png\"><pre>";
-
-            // Output a string representation of the request
-            html += request.toString();
-
-            html += "</pre><br/>Try the test form:"
-                    + "<form method=\"POST\" action=\"handler.html\">"
-                    + "<input type=\"text\" name=\"field1\">"
-                    + "<input type=\"text\" name=\"field2\">"
-                    + "<input type=\"submit\">"
-                    + "</form></body></html>";
-
+            html = getHead("Пустая страница") +
+                    "<body></body></html>";
             data_ = html.getBytes();
-
             handled = true;
-            // Set the resulting mime type
+            mime_type_ = "text/html";
+        } else if (url.indexOf("about") != -1) {
+            String html;
+            html = getHead("О программе") +
+                        "<body " + getDefaultBodyStyle() + ">" +
+                            "<center>" +
+                                "<div style='margin-top: 5%;'>" +
+                                    "<img src='entery://res/logo2.png'>" +
+                                    "<br>" +
+                                    "<img src='entery://res/author.png'>" +
+                                    "<br>" +
+                                    "<img src='entery://res/withCEF.png'>" +
+                                    "<br><br>" +
+                                    "<b>Отдельное спасибо:</b>" +
+                                    "<br>" +
+                                    "- Разработчикам из FormDev Software GmbH за FlatLaF, стиль интерфейса,<br>который используется для реализации интерфейса КС Энтэри." +
+                                    "<br>" +
+                                    "- Мистеру Рексу за систему вкладок для браузера и новый минималистичный интерфейс." +
+                                    "<br>" +
+                                    "<h3>" + VER_APP + "</h3>" +
+                                "</div>" +
+                            "</center>" +
+                        "</body>" +
+                    "</html>";
+            data_ = html.getBytes();
+            handled = true;
+            mime_type_ = "text/html";
+        } else if (url.indexOf("help") != -1) {
+            String html;
+            html = getHead("Учебник") +
+                        "<body " + getDefaultBodyStyle() + ">" +
+                            "<center>" +
+                                "<div style='margin-top: 3%; margin-bottom: 3%;'>" +
+                                    "<img src='entery://res/logo2.png'>" +
+                                    "<br>" +
+                                    "<h2>Интерфейс</h2>" +
+                                    "<img src='entery://res/hinterface.png'>" +
+                                    "<br><br>" +
+                                    "<span style='font-size: 15px;'><b>" +
+                                        "1. Назад; 2. Вперёд; 3. Домашняя страница(Загружается в текущей);<br>" +
+                                        "4. Перезагрузить страницу/Остановить загрузку страницы;<br>" +
+                                        "5. Режим \"Картинка в картинке\"*; 6. Меню; 7. Менеджер загрузок;<br>" +
+                                        "8. Закрыть вкладку; 9. Открыть вкладку." +
+                                    "</b></span><br><br>" +
+                                    "* - Режим \"Картинка в картинке\" позволяет перенести видео контент, если он<br>" +
+                                    "есть на сайте, в новое окно, которое позиционируется поверх других окон.<br><br>" +
+                                    "Обратите внимание: Менеджер загрузок пустой, если не было загрузок в текущей сессии.<br><br>" +
+                                    "<h2>Горячие клавиши</h2>" +
+                                    "Их немного." +
+                                    "<br>" +
+                                    "<span style='font-size: 15px;'><b>" +
+                                    "F5 - Перезагрузить страницу в текущей вкладке<br>" +
+                                    "CTRL + T - Новая вкладка<br>" +
+                                    "CTRL + R - Вернуть последнюю закрытую вкладку<br>" +
+                                    "CTRL + W - Закрытие текущей вкладки<br>" +
+                                    "CTRL + (+) - Увеличить масштаб текущей страницы<br>" +
+                                    "CTRL + (-) - Уменьшить масштаб текущей страницы" +
+                                    "</b></span>" +
+                                "</div>" +
+                            "</center>" +
+                        "</body>" +
+                    "</html>";
+            data_ = html.getBytes();
+            handled = true;
             mime_type_ = "text/html";
         } else if (url.endsWith(".png")) {
             handled = loadContent(url.substring(url.lastIndexOf('/') + 1));
@@ -112,7 +162,7 @@ public class ClientSchemeHandler extends CefResourceHandlerAdapter {
     }
 
     private boolean loadContent(String resName) {
-        InputStream inStream = getClass().getResourceAsStream(resName);
+        InputStream inStream = init.class.getResourceAsStream("res/" + resName);
         if (inStream != null) {
             try {
                 ByteArrayOutputStream outFile = new ByteArrayOutputStream();
@@ -121,8 +171,27 @@ public class ClientSchemeHandler extends CefResourceHandlerAdapter {
                 data_ = outFile.toByteArray();
                 return true;
             } catch (IOException e) {
+                // Ничего
             }
         }
         return false;
+    }
+
+    private String getHead(String Title) {
+        String charset;
+        if (GetOS.isWindows()) {
+            charset = "<meta charset=\"windows-1251\">";
+        } else {
+            charset = "<meta charset=\"UTF-8\">";
+        }
+        return "<html>" +
+                    "<head>" +
+                        "<title>" + Title + "</title>" +
+                        charset +
+                    "</head>";
+    }
+
+    private String getDefaultBodyStyle() {
+        return "style='font-family: sans-serif; background-color: #212121; color: #DCDCDC;'";
     }
 }

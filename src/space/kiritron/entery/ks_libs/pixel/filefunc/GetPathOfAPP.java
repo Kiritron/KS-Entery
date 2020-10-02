@@ -36,18 +36,17 @@ public class GetPathOfAPP {
      * @return возвращает слеш, но в случае, если систему не удалось опознать - NULL.
      */
     public static String GetSep() {
-        String OS = GetOS.Get();
         String Sep = null;
 
-        if (OS.contains("Linux")) {
+        if (GetOS.isLinux()) {
             Sep = "/";
         }
 
-        if (OS.contains("Mac")) {
+        if (GetOS.isMacintosh()) {
             Sep = "/";
         }
 
-        if (OS.contains("Windows")) {
+        if (GetOS.isWindows()) {
             Sep = "\\";
         }
 

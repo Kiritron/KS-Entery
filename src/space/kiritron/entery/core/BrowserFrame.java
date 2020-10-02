@@ -48,6 +48,12 @@ public class BrowserFrame extends JFrame {
         //      when the last browser window is destroyed.
         //   2. CefAppHandler.stateHasChanged terminates the application by calling
         //      System.exit(0) when the state changes to CefAppState.TERMINATED.
+
+        /*
+
+        Киритрон: Отключил данный слушатель, так как решил закрывать
+        браузер иным способом.
+
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
@@ -80,6 +86,38 @@ public class BrowserFrame extends JFrame {
                 }
             }
         });
+
+         */
+    }
+
+    public void MainFrameClosed() {
+        if (browser_ == null) {
+            // If there's no browser we can dispose immediately.
+            isClosed_ = true;
+            toConsole.print(genLogMessage.gen((byte) 1, false, "BrowserFrame.windowClosing Frame.dispose"));
+            dispose();
+            return;
+        }
+
+        boolean isClosed = isClosed_;
+
+        if (isClosed) {
+            // Cause browser.doClose() to return false so that OSR browsers
+            // can close.
+            browser_.setCloseAllowed();
+        }
+
+        // Results in another call to this method.
+        toConsole.print(genLogMessage.gen((byte) 1, false, "BrowserFrame.windowClosing CefBrowser.close(" + isClosed + ")"));
+        browser_.close(isClosed);
+        if (!isClosed_) {
+            isClosed_ = true;
+        }
+        if (isClosed) {
+            // Dispose after the 2nd call to this method.
+            toConsole.print(genLogMessage.gen((byte) 1, false, "BrowserFrame.windowClosing Frame.dispose"));
+            dispose();
+        }
     }
 
     public void setBrowser(CefBrowser browser) {

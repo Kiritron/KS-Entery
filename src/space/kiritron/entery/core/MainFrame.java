@@ -3,6 +3,13 @@
 
 package space.kiritron.entery.core;
 
+import java.awt.*;
+import java.awt.event.*;
+import java.io.IOException;
+import java.util.ArrayList;
+
+import javax.swing.*;
+
 import org.cef.CefApp;
 import org.cef.CefApp.CefVersion;
 import org.cef.CefClient;
@@ -15,15 +22,8 @@ import org.cef.handler.CefFocusHandlerAdapter;
 import org.cef.handler.CefLoadHandlerAdapter;
 import org.cef.network.CefCookieManager;
 
-import java.awt.*;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
-import java.io.IOException;
-
-import javax.swing.*;
-
+import space.kiritron.entery.core.ui.TabComponent;
+import space.kiritron.entery.init;
 import space.kiritron.entery.core.dialog.DownloadDialog;
 import space.kiritron.entery.core.dialog.WelcomeWindow;
 import space.kiritron.entery.core.handler.AppHandler;
@@ -35,17 +35,21 @@ import space.kiritron.entery.core.handler.MessageRouterHandler;
 import space.kiritron.entery.core.handler.MessageRouterHandlerEx;
 import space.kiritron.entery.core.handler.RequestHandler;
 import space.kiritron.entery.core.ui.ControlPanel;
-import space.kiritron.entery.core.ui.MenuBar;
-import space.kiritron.entery.core.ui.StatusPanel;
+import space.kiritron.entery.core.ui.TabManager;
 import space.kiritron.entery.core.util.DataUri;
-import space.kiritron.entery.init;
 import space.kiritron.entery.ks_libs.pixel.filefunc.FileControls;
 import space.kiritron.entery.ks_libs.pixel.filefunc.GetPathOfAPP;
 import space.kiritron.entery.ks_libs.pixel.logger.genLogMessage;
 import space.kiritron.entery.ks_libs.pixel.logger.toConsole;
 import space.kiritron.entery.ks_libs.tolchok.TOLF_Handler;
 
+import static space.kiritron.entery.init.outdated_major;
+import static space.kiritron.entery.init.pathOfEngineOptions;
+
 public class MainFrame extends BrowserFrame {
+    public static MainFrame frame = null;
+    public static TabManager tabManager = null;
+
     private static final long serialVersionUID = -2295538706810864538L;
     public void start(boolean osrEnabledArg, boolean transparentPaintingEnabledArg, boolean createImmediately, String link, String[] args) {
         // Perform startup initialization on platforms that require it.
@@ -58,7 +62,7 @@ public class MainFrame extends BrowserFrame {
 
         // MainFrame keeps all the knowledge to display the embedded browser
         // frame.
-        final MainFrame frame = new MainFrame(osrEnabledArg, transparentPaintingEnabledArg, createImmediately, link, args);
+        frame = new MainFrame(osrEnabledArg, transparentPaintingEnabledArg, createImmediately, link, args);
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         int sizeWidth;
         int sizeHeight;
@@ -123,6 +127,43 @@ public class MainFrame extends BrowserFrame {
             */
         });
 
+        // Киритрон: Добавил слушатель, который отлавливает попытку закрыть окно пользователем
+        // и браузер интересуется, уверен ли пользователь в этом. Если да, то убиваются экземпляры
+        // браузеров(по крайней мере так задумывалось) и программа жестко завершается через
+        // System.exit(0).
+        //
+        // Однако это вызвало проблему, что по сути программа завершается с крашем, пусть и код
+        // завершения равен 0. Данный баг провоцируется, если открыто более одной вкладки.
+        //
+        // UPD: Ниже был реализован костыль в блоке for, который перед закрытием закрывает все вкладки и убивает тем самым
+        // экземпляры браузеров. Баг, который был описан выше, в принципе исправлен, но есть подозрения, что он перешёл в
+        // плавающий баг, то есть баг, который как бы есть, но его как бы и нет. Требуется больше тестов.
+        frame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE); // Но сначала необходимо предотвратить закрытие окна по нажатию на крестик
+        frame.addWindowListener(new WindowAdapter() { // Сам слушатель
+            public void windowClosing(WindowEvent e) {
+                int dialogResult = JOptionPane.showConfirmDialog(frame, "Вы собираетесь закрыть браузер Энтэри.\n" +
+                                "Вы уверены, что хотите этого?",
+                        "Закрытие Энтэри", JOptionPane.YES_NO_OPTION, JOptionPane.PLAIN_MESSAGE);
+
+                if (dialogResult == JOptionPane.YES_OPTION) {
+                    // Блок try и костыль внутри
+                    try {
+                        int CountOfTabs = tabManager.getTabCount() - 1;
+
+                        for (int sd = CountOfTabs; sd != 0;) {
+                            tabManager.CloseTab(sd-1);
+                            sd--;
+                        }
+                    } catch (Exception eee) {
+                        // Ничего
+                    }
+
+                    MainFrameClosed();
+                    System.exit(0);
+                }
+            }
+        });
+
         if (!FileControls.SearchFile(GetPathOfAPP.GetPathWithSep() + ".opened")) {
             try {
                 FileControls.CreateFile(GetPathOfAPP.GetPathWithSep() + ".opened");
@@ -132,13 +173,33 @@ public class MainFrame extends BrowserFrame {
                 // Ничего
             }
         }
+
+        if (outdated_major) {
+            if (!FileControls.SearchFile(GetPathOfAPP.GetPathWithSep() + ".majorupdateopened")) {
+                try {
+                    FileControls.CreateFile(GetPathOfAPP.GetPathWithSep() + ".majorupdateopened");
+                    int dialogResult = JOptionPane.showConfirmDialog(this, "Доброго времени суток!\n" +
+                                    "Вы видите данное сообщение потому, что при инициализации\n" +
+                                    "было обнаружено, что для Энтэри вышло мажорное или же\n" +
+                                    "крупное обновление, которое наверняка содержит много\n" +
+                                    "исправлений и нововведений. Открыть страницу загрузки?\n\n" +
+                                    "Данное сообщение появляется лишь раз.",
+                            "Доступно крупное обновление для Энтэри", JOptionPane.YES_NO_OPTION, JOptionPane.PLAIN_MESSAGE);
+
+                    if (dialogResult == JOptionPane.YES_OPTION) {
+                        tabManager.OpenTabFromTab("https://kiritron.space/projects/entery/");
+                    }
+                } catch (IOException vywg) {
+                    // Ничего
+                }
+            }
+        }
     }
 
     private final CefClient client_;
     private String errorMsg_ = "";
     private ControlPanel control_pane_;
-    private StatusPanel status_panel_;
-    private boolean browserFocus_ = true;
+    public boolean browserFocus_ = true;
     private boolean osr_enabled_;
     private boolean transparent_painting_enabled_;
 
@@ -146,7 +207,7 @@ public class MainFrame extends BrowserFrame {
         boolean createImmediately, String link, String[] args) {
             this.osr_enabled_ = osrEnabled;
             this.transparent_painting_enabled_ = transparentPaintingEnabled;
-
+            
             CefApp myApp;
             if (CefApp.getState() != CefApp.CefAppState.INITIALIZED) {
                 // 1) CefApp is the entry point for JCEF. You can pass
@@ -202,36 +263,23 @@ public class MainFrame extends BrowserFrame {
             msgRouter.addHandler(new MessageRouterHandlerEx(client_), false);
             client_.addMessageRouter(msgRouter);
 
-            // 2.1) We're overriding CefDisplayHandler as nested anonymous class
-            //      to update our address-field, the title of the panel as well
-            //      as for updating the status-bar on the bottom of the browser
-            client_.addDisplayHandler(new CefDisplayHandlerAdapter() {
-                @Override
-                public void onAddressChange(CefBrowser browser, CefFrame frame, String url) {
-                    control_pane_.setAddress(browser, url);
-                }
-                @Override
-                public void onTitleChange(CefBrowser browser, String title) {
-                    setTitle("[Энтэри] " + title);
-                }
-                @Override
-                public void onStatusMessage(CefBrowser browser, String value) {
-                    status_panel_.setStatusText(value);
-                }
-            });
-
-            // 2.2) To disable/enable navigation buttons and to display a prgress bar
+            // 2.2) To disable/enable navigation buttons and to display a progress bar
             //      which indicates the load state of our website, we're overloading
             //      the CefLoadHandler as nested anonymous class. Beside this, the
             //      load handler is responsible to deal with (load) errors as well.
             //      For example if you navigate to a URL which does not exist, the
             //      browser will show up an error message.
+
             client_.addLoadHandler(new CefLoadHandlerAdapter() {
                 @Override
-                public void onLoadingStateChange(CefBrowser browser, boolean isLoading,
-                        boolean canGoBack, boolean canGoForward) {
-                    control_pane_.update(browser, isLoading, canGoBack, canGoForward);
-                    status_panel_.setIsInProgress(isLoading);
+                public void onLoadingStateChange(CefBrowser browser, boolean isLoading, boolean canGoBack, boolean canGoForward) {
+                    tabManager.controlPanels.get(tabManager.getSelectedIndex() + 1).update(
+                            browser,
+                            isLoading,
+                            canGoBack,
+                            canGoForward
+                    );
+                    //status_panel_.setIsInProgress(isLoading);
 
                     if (!isLoading && !errorMsg_.isEmpty()) {
                         browser.loadURL(DataUri.create("text/html", errorMsg_));
@@ -244,30 +292,34 @@ public class MainFrame extends BrowserFrame {
                         String errorText, String failedUrl) {
                     if (errorCode != ErrorCode.ERR_NONE && errorCode != ErrorCode.ERR_ABORTED) {
                         errorMsg_ = "<html><head>";
-                        errorMsg_ += "<title>Ошибка при загрузке страницы</title>";
-                        errorMsg_ += "</head><body style='font-family: serif; background-color: #696969; color: #DCDCDC;'>";
+                        errorMsg_ += "<meta charset=\"UTF-8\"><title>Ошибка при загрузке страницы</title>";
+                        errorMsg_ += "</head><body style='font-family: sans-serif; background-color: #212121; color: #DCDCDC;'>";
+                        errorMsg_ += "<center><div style='margin-top: 10%;'>";
                         errorMsg_ += "<h1>Сбой в загрузке страницы</h1>";
-                        errorMsg_ += "<h3>Адрес страницы: " + failedUrl + "</h3>";
+                        errorMsg_ += "<h3>Адрес страницы - " + failedUrl + "</h3>";
                         errorMsg_ += "<p>" + "Код ошибки: " + (errorText == null ? "" : errorText) + "</p>";
+                        errorMsg_ += "</div></center>";
                         errorMsg_ += "</body></html>";
+
                         browser.stopLoad();
                     }
                 }
             });
 
             // Create the browser.
+            
             CefBrowser browser;
             if (link == null) {
                 browser = client_.createBrowser(
-                        "https://duckduckgo.com/", osrEnabled, transparentPaintingEnabled, null);
+                        init.HomePage, osrEnabled, transparentPaintingEnabled, null);
             } else {
                 browser = client_.createBrowser(
                         link, osrEnabled, transparentPaintingEnabled, null);
             }
-            setBrowser(browser);
+            //setBrowser(browser);
 
             // Set up the UI for this example implementation.
-            JPanel contentPanel = createContentPanel();
+            JPanel contentPanel = createContentPanel(this, null, control_pane_, downloadDialog, CefCookieManager.getGlobalManager(), client_);
             getContentPane().add(contentPanel, BorderLayout.CENTER);
 
             // Clear focus from the browser when the address field gains focus.
@@ -299,21 +351,37 @@ public class MainFrame extends BrowserFrame {
 
             if (createImmediately) browser.createImmediately();
 
-            // Add the browser to the UI.
-            contentPanel.add(getBrowser().getUIComponent(), BorderLayout.CENTER);
-
-            MenuBar menuBar = new MenuBar(
-                    this, browser, control_pane_, downloadDialog, CefCookieManager.getGlobalManager());
-
-            setJMenuBar(menuBar);
+            tabManager = new TabManager(this, contentPanel, browser, control_pane_, client_, osrEnabled, transparentPaintingEnabled, downloadDialog, CefCookieManager.getGlobalManager());
+            //contentPanel.add(TabManager, BorderLayout.CENTER);
+            tabManager.OpenTab(init.HomePage);
+            
+            // 2.1) We're overriding CefDisplayHandler as nested anonymous class
+            //      to update our address-field, the title of the panel as well
+            //      as for updating the status-bar on the bottom of the browser
+            client_.addDisplayHandler(new CefDisplayHandlerAdapter() {
+                @Override
+                public void onAddressChange(CefBrowser browser, CefFrame frame, String url) {
+                    //control_pane_.setAddress(browser, url);
+                    tabManager.UpdateTab(browser, null, url);
+                }
+                @Override
+                public void onTitleChange(CefBrowser browser, String title) {
+                    setTitle(title + " — Энтэри");
+                    tabManager.UpdateTab(browser, title, null);
+                }
+                @Override
+                public void onStatusMessage(CefBrowser browser, String value) {
+                    //status_panel_.setStatusText(value);
+                }
+            });
     }
 
-    private JPanel createContentPanel() {
+    private JPanel createContentPanel(MainFrame owner, CefBrowser browser, ControlPanel control_pane, DownloadDialog downloadDialog, CefCookieManager cookieManager, CefClient client_) {
         JPanel contentPanel = new JPanel(new BorderLayout());
-        control_pane_ = new ControlPanel(getBrowser());
-        status_panel_ = new StatusPanel(getBrowser(), control_pane_);
-        contentPanel.add(control_pane_, BorderLayout.NORTH);
-        contentPanel.add(status_panel_, BorderLayout.SOUTH);
+        control_pane_ = new ControlPanel(owner, browser, downloadDialog, cookieManager, client_);
+        //tabManager.controlPanels.add(control_pane_);
+        //contentPanel.add(control_pane_, BorderLayout.NORTH);
+        //contentPanel.add(status_panel_, BorderLayout.SOUTH);
         return contentPanel;
     }
 

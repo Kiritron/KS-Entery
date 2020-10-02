@@ -1,6 +1,5 @@
-// Copyright (c) 2013 The Chromium Embedded Framework Authors. All rights
-// reserved. Use of this source code is governed by a BSD-style license that
-// can be found in the LICENSE file.
+// Copyright (c) 2013 The Chromium Embedded Framework Authors. All rights reserved.
+// Copyright (c) 2020 Киритрон Стэйблкор.
 
 package org.cef;
 
@@ -43,6 +42,7 @@ import org.cef.network.CefRequest.TransitionType;
 import org.cef.network.CefResponse;
 import org.cef.network.CefURLRequest;
 import org.cef.network.CefWebPluginInfo;
+import space.kiritron.entery.core.ui.TabComponent;
 
 import java.awt.Component;
 import java.awt.Container;
@@ -58,6 +58,8 @@ import java.util.HashMap;
 import java.util.Vector;
 
 import javax.swing.SwingUtilities;
+
+import static space.kiritron.entery.core.MainFrame.tabManager;
 
 /**
  * Client that owns a browser and renderer.
@@ -499,12 +501,21 @@ public class CefClient extends CefClientHandler
     }
 
     @Override
-    public boolean onBeforePopup(
-            CefBrowser browser, CefFrame frame, String target_url, String target_frame_name) {
+    // Киритрон: Кто бы мог подумать, что решение перевода новых окон во вкладки было таким
+    // простым и хранилось в Java коде? Получается я зря в код фреймворка лез? ._.
+    public boolean onBeforePopup(CefBrowser browser, CefFrame frame, String target_url, String target_frame_name) {
         if (isDisposed_) return true;
-        if (lifeSpanHandler_ != null && browser != null)
-            return lifeSpanHandler_.onBeforePopup(browser, frame, target_url, target_frame_name);
-        return false;
+        try { // Поскольку в этом участке есть риск возникновения ошибки, её нужно обработать
+            if (lifeSpanHandler_ != null && browser != null) {
+                tabManager.OpenTabFromTab(target_url); // Киритрон: Загружаем перехваченный адрес на новой вкладке
+                return true; // Киритрон: Отключает появление вкладки вне окна браузера
+            }
+        } catch (Exception E) {
+            // TODO: Сделать адекватную обработку ошибки
+            E.printStackTrace();
+            return true;
+        }
+        return true; // Киритрон: Отключает появление вкладки вне окна браузера
     }
 
     @Override

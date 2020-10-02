@@ -30,7 +30,14 @@ public class ContextMenuHandler implements CefContextMenuHandler {
             CefBrowser browser, CefFrame frame, CefContextMenuParams params, CefMenuModel model) {
         model.clear();
 
-        // Navigation menu
+
+        model.addItem(MenuId.MENU_ID_COPY, "Копировать");
+        model.addItem(MenuId.MENU_ID_PASTE, "Вставить");
+        model.addItem(MenuId.MENU_ID_CUT, "Вырезать");
+        model.addItem(MenuId.MENU_ID_DELETE, "Удалить");
+        model.addItem(MenuId.MENU_ID_UNDO, "Отменить");
+        model.addItem(MenuId.MENU_ID_REDO, "Повторить");
+        model.addSeparator();
         model.addItem(MenuId.MENU_ID_BACK, "Назад");
         model.setEnabled(MenuId.MENU_ID_BACK, browser.canGoBack());
 

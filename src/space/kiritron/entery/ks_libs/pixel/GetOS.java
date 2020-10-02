@@ -1,9 +1,13 @@
 package space.kiritron.entery.ks_libs.pixel;
 
+import space.kiritron.entery.ks_libs.pixel.filefunc.FileControls;
+
+import java.io.IOException;
+
 /**
  * Класс с методами, которые позволяют получить информацию об ОС.
  * @author Киритрон Стэйблкор и MR.REX
- * @version 1.1
+ * @version 1.2
  */
 
 //Киритрон: Вношу изменения уже второй раз, так как немного обосрался с контролем версий и потерял
@@ -21,8 +25,55 @@ public class GetOS {
      * @return возвращает имя операционной системы.
      */
     public static String Get() {
-        //Киритрон: Сохранено, чтобы не было проблем с совместимостью.
         return System.getProperty("os.name");
+    }
+
+    /**
+     * Узнать на Windows ли сейчас работает данная программа.
+     * @return возвращает boolean значение.
+     */
+    public static final boolean isWindows() {
+        return Get().toLowerCase().contains("windows");
+    }
+
+    /**
+     * Узнать на OS X ли сейчас работает данная программа.
+     * @return возвращает boolean значение.
+     */
+    public static final boolean isMacintosh() {
+        return Get().toLowerCase().contains("mac");
+    }
+
+    /**
+     * Узнать на системе с ядром Linux сейчас работает данная программа или нет.
+     * @return возвращает boolean значение.
+     */
+    public static final boolean isLinux() {
+        return Get().toLowerCase().contains("linux");
+    }
+
+    /**
+     * Узнать на КС Догиру ли сейчас работает данная программа.
+     * @return возвращает boolean значение.
+     */
+    public static final boolean isDogiru() {
+        boolean out;
+
+        if (Get().toLowerCase().contains("linux")) {
+            try {
+                if (FileControls.ReadFile("/etc/release").toLowerCase().contains("dogiru")) {
+                    out = true;
+                } else {
+                    out = false;
+                }
+            } catch (IOException e) {
+                out = false;
+            }
+        } else {
+            out = false;
+        }
+
+        return out;
     }
 
     /**

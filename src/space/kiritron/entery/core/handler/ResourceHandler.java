@@ -11,6 +11,7 @@ import org.cef.network.CefResponse;
 
 public class ResourceHandler extends CefResourceHandlerAdapter {
     private int startPos = 0;
+    // TODO: Вспомнить, что это вообще такое и за что отвечает
     private static final String html = new String("<html>\n"
             + "  <head>\n"
             + "    <title>ResourceHandler Test</title>\n"

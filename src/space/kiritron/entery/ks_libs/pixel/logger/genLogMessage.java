@@ -1,6 +1,12 @@
 package space.kiritron.entery.ks_libs.pixel.logger;
 
 import space.kiritron.entery.ks_libs.pixel.GDate;
+import space.kiritron.entery.ks_libs.pixel.filefunc.GetPathOfAPP;
+
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 
 /**
  * Класс с методами для генерации вывода в консоль.

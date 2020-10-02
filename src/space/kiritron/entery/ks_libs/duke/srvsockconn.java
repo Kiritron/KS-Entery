@@ -7,7 +7,7 @@ import java.net.UnknownHostException;
 /**
  * Класс с методом получения и сравнения версий по SOCKET.
  * @author Киритрон Стэйблкор
- * @version 1.0
+ * @version 3.0
  */
 
 public class srvsockconn {
@@ -20,7 +20,7 @@ public class srvsockconn {
      * @return возвращает результат проверки. OK - Всё в порядке. DIFFERENCE_FINDED - Есть различия. Другой ответ - признак ошибки.
      */
 
-    public static String checkVersion(String HOST, int PORT, String NAME_APP, String VER_APP) {
+    public static String checkVersion(String HOST, int PORT, String NAME_APP, String VER_APP, boolean checkMajor) {
         String ServerVersion = null;
         try (Socket socket = new Socket(HOST, PORT)) {
             OutputStream output = socket.getOutputStream();
@@ -31,10 +31,18 @@ public class srvsockconn {
             BufferedReader reader = new BufferedReader(new InputStreamReader(input));
             String ServerAnswer = reader.readLine();
             socket.close();
-            if (VER_APP.equals(ServerAnswer)) {
-                ServerVersion = "OK";
+            if (versionHandler.checkDifference(VER_APP, ServerAnswer)) {
+                if (checkMajor) {
+                    if (versionHandler.checkMajorMarker(ServerAnswer)) {
+                        ServerVersion = "DIFFERENCE_FINDED. MAJOR.";
+                    } else {
+                        ServerVersion = "DIFFERENCE_FINDED. MINOR.";
+                    }
+                } else {
+                    ServerVersion = "DIFFERENCE_FINDED";
+                }
             } else {
-                ServerVersion = "DIFFERENCE_FINDED";
+                ServerVersion = "OK";
             }
         } catch (UnknownHostException ex) {
             ServerVersion = "UNKNOWN_HOST_ERROR";

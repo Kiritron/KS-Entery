@@ -13,7 +13,7 @@ import java.security.cert.X509Certificate;
 /**
  * Класс с методом получения и сравнения версий через HTTP/HTTPS.
  * @author Киритрон Стэйблкор
- * @version 2.0
+ * @version 3.0
  */
 
 public class httpconn {
@@ -21,11 +21,15 @@ public class httpconn {
      * Проверка версии с помощью подключения к веб-серверу. Получает контент от веб сервера и сравнивает его с версией приложения.
      * @param URL Адрес в веб пространстве, по которому можно узнать актуальную версию приложения.
      * @param SSL_Verification Необходимо ли проверять SSL сертификаты.
+     * @param checkMajor Необходимо ли проверять мажорность версии. Иначе говоря её критичность, массивность.
+     *                   Если будет установлено TRUE, то ответ от веб-сервера должен быть примерно таким "2.0:::major".
+     *                   Если ":::major" присутствует в ответе сервера и если обнаружено различие в версиях, то будет
+     *                   возвращено "DIFFERENCE_FINDED. MAJOR.", а если нет, то "DIFFERENCE_FINDED. MINOR.".
      * @param VER_APP Версия этого приложения(Не та, что на сервере).
      * @return возвращает результат проверки. OK - Всё в порядке. DIFFERENCE_FINDED - Есть различия. Другой ответ - признак ошибки.
      */
 
-    public static String checkVersion(String URL, boolean SSL_Verification, String VER_APP) {
+    public static String checkVersion(String URL, boolean SSL_Verification, boolean checkMajor, String VER_APP) {
         String ServerVersion = null;
 
         if (SSL_Verification == false) {
@@ -35,10 +39,18 @@ public class httpconn {
         String out = HTTPConn(URL);
 
         if (!out.contains("ERROR")) {
-            if (Check(VER_APP, out)) {
-                ServerVersion = "OK";
+            if (versionHandler.checkDifference(VER_APP, out)) {
+                if (checkMajor) {
+                    if (versionHandler.checkMajorMarker(out)) {
+                        ServerVersion = "DIFFERENCE_FINDED. MAJOR.";
+                    } else {
+                        ServerVersion = "DIFFERENCE_FINDED. MINOR.";
+                    }
+                } else {
+                    ServerVersion = "DIFFERENCE_FINDED";
+                }
             } else {
-                ServerVersion = "DIFFERENCE_FINDED";
+                ServerVersion = "OK";
             }
         } else {
             ServerVersion = "GET_VERSION_CODE_ERROR";
@@ -68,14 +80,6 @@ public class httpconn {
             }
         } else {
             return "URL_EMPTY_ERROR";
-        }
-    }
-
-    private static boolean Check(String VER_APP, String VER_FROM_SERVER) {
-        if (VER_APP.equals(VER_FROM_SERVER)) {
-            return true;
-        } else {
-            return false;
         }
     }
 

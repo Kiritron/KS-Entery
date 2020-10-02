@@ -1,5 +1,10 @@
 package space.kiritron.entery.ks_libs.pixel.genhash;
 
+import java.io.UnsupportedEncodingException;
+import java.math.BigInteger;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+
 /**
  * Класс с методом по созданию хеша алгоритмом MD5.
  * @author Киритрон Стэйблкор
