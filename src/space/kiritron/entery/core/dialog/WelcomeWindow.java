@@ -1,14 +1,27 @@
-// Copyright (c) 2020 Киритрон Стэйблкор.
+/*
+ * Copyright 2020 Kiritron's Space
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 package space.kiritron.entery.core.dialog;
-
-import space.kiritron.entery.init;
 
 import javax.swing.*;
 import java.awt.*;
 
-import static space.kiritron.entery.init.VER_APP;
-
+/**
+ * @author Киритрон Стэйблкор
+ */
 
 @SuppressWarnings("serial")
 public class WelcomeWindow extends JDialog {
@@ -33,7 +46,7 @@ public class WelcomeWindow extends JDialog {
                                 " Данный браузер развивается с уклоном на минимализм и стремится не содержать в себе лишние модули, которыми большинство не" +
                                 " пользуется. Обратите внимание, что данный продукт в раннем доступе и некоторые функции ещё не реализованы, а что-то работает" +
                                 " не так хорошо. Мы дадим вам знать, когда выйдет обновление с исправлениями и новыми функциями.<br><br>" +
-                                "Мы рекомендуем открыть Справку в меню Дополнительно, на случай, если возникнут вопросы. Мы не даём гарантии, что справка" +
+                                "Мы рекомендуем открыть Учебник в меню Справка, на случай, если возникнут вопросы. Мы не даём гарантии, что справка" +
                                 " сможет ответить на все ваши вопросы касательно Энтэри, но в этом случае в нашей группе ВК присутствует обратная связь. Мы" +
                                 " будем рады ответить на ваши вопросы и помочь использовать Энтэри.<br><br>" +
                                 "Приятного пользования." +

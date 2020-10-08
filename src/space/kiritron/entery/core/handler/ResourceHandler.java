@@ -1,6 +1,20 @@
-package space.kiritron.entery.core.handler;
+/*
+ * Copyright 2020 Kiritron's Space
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
-import java.nio.ByteBuffer;
+package space.kiritron.entery.core.handler;
 
 import org.cef.callback.CefCallback;
 import org.cef.handler.CefResourceHandlerAdapter;
@@ -9,10 +23,15 @@ import org.cef.misc.StringRef;
 import org.cef.network.CefRequest;
 import org.cef.network.CefResponse;
 
+/**
+ * @author Киритрон Стэйблкор and The Chromium Embedded Framework Authors.
+ */
+
 public class ResourceHandler extends CefResourceHandlerAdapter {
     private int startPos = 0;
-    // TODO: Вспомнить, что это вообще такое и за что отвечает
-    private static final String html = new String("<html>\n"
+    // TODO: Вспомнить, что это вообще такое и за что отвечает.
+    // Киритрон(04.10.2020): Вспомнил. Нам пока это не нужно.
+    /*private static final String html = new String("<html>\n"
             + "  <head>\n"
             + "    <title>ResourceHandler Test</title>\n"
             + "  </head>\n"
@@ -22,7 +41,7 @@ public class ResourceHandler extends CefResourceHandlerAdapter {
             + "       no HTTP request was sent to the internet.\n"
             + "    <p>See class <u>tests.handler.ResourceHandler</u> and the <u>RequestHandler</u> implementation for details.</p>\n"
             + "  </body>\n"
-            + "</html>");
+            + "</html>");*/
 
     @Override
     public boolean processRequest(CefRequest request, CefCallback callback) {
@@ -34,19 +53,17 @@ public class ResourceHandler extends CefResourceHandlerAdapter {
     }
 
     @Override
-    public void getResponseHeaders(
-            CefResponse response, IntRef response_length, StringRef redirectUrl) {
+    public void getResponseHeaders(CefResponse response, IntRef response_length, StringRef redirectUrl) {
         System.out.println("getResponseHeaders: " + response);
 
-        response_length.set(html.length());
+        //response_length.set(html.length());
         response.setMimeType("text/html");
         response.setStatus(200);
     }
 
     @Override
-    public boolean readResponse(
-            byte[] data_out, int bytes_to_read, IntRef bytes_read, CefCallback callback) {
-        int length = html.length();
+    public boolean readResponse(byte[] data_out, int bytes_to_read, IntRef bytes_read, CefCallback callback) {
+        /*int length = html.length();
         if (startPos >= length) return false;
 
         // Extract up to bytes_to_read bytes from the html data
@@ -60,7 +77,7 @@ public class ResourceHandler extends CefResourceHandlerAdapter {
         result.put(dataToSend.getBytes());
         bytes_read.set(dataToSend.length());
 
-        startPos = endPos;
+        startPos = endPos;*/
         return true;
     }
 

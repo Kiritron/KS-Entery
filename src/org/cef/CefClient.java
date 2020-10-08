@@ -42,6 +42,7 @@ import org.cef.network.CefRequest.TransitionType;
 import org.cef.network.CefResponse;
 import org.cef.network.CefURLRequest;
 import org.cef.network.CefWebPluginInfo;
+import space.kiritron.entery.core.MainFrame;
 import space.kiritron.entery.core.ui.TabComponent;
 
 import java.awt.Component;
@@ -57,7 +58,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Vector;
 
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 
 import static space.kiritron.entery.core.MainFrame.tabManager;
 
@@ -511,8 +512,8 @@ public class CefClient extends CefClientHandler
                 return true; // Киритрон: Отключает появление вкладки вне окна браузера
             }
         } catch (Exception E) {
-            // TODO: Сделать адекватную обработку ошибки
-            E.printStackTrace();
+            JOptionPane.showConfirmDialog(MainFrame.frame, "Не удалось открыть вкладку из-за сбоя в браузере.",
+                    "Сбой при открытии вкладки.", JOptionPane.OK_OPTION, JOptionPane.PLAIN_MESSAGE);;
             return true;
         }
         return true; // Киритрон: Отключает появление вкладки вне окна браузера
@@ -608,7 +609,6 @@ public class CefClient extends CefClientHandler
             loadHandler_.onLoadingStateChange(browser, isLoading, canGoBack, canGoForward);
     }
 
-    // TODO: Можно сделать подкоп ещё тут
     @Override
     public void onLoadStart(CefBrowser browser, CefFrame frame, TransitionType transitionType) {
         if (loadHandler_ != null && browser != null)

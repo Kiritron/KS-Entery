@@ -1,11 +1,14 @@
 // Copyright (c) 2014 The Chromium Embedded Framework Authors. All rights reserved.
-// Copyright (c) 2020 Киритрон Стэйблкор.
 
 package space.kiritron.entery.core.handler;
 
 import org.cef.browser.CefBrowser;
 import org.cef.callback.CefDragData;
 import org.cef.handler.CefDragHandler;
+
+/**
+ * @author The Chromium Embedded Framework Authors.
+ */
 
 public class DragHandler implements CefDragHandler {
     @Override

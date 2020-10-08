@@ -16,7 +16,6 @@ public abstract class CefLoadHandlerAdapter implements CefLoadHandler {
     @Override
     public void onLoadingStateChange(
             CefBrowser browser, boolean isLoading, boolean canGoBack, boolean canGoForward) {}
-    // TODO: Обратить внимание на это. Возможно получится перехватить.
     @Override
     public void onLoadStart(CefBrowser browser, CefFrame frame, TransitionType transitionType) {}
 

@@ -1,5 +1,4 @@
 // Copyright (c) 2014 The Chromium Embedded Framework Authors. All rights reserved.
-// Copyright (c) 2020 Киритрон Стэйблкор.
 
 package space.kiritron.entery.core.handler;
 
@@ -7,6 +6,10 @@ import org.cef.browser.CefBrowser;
 import org.cef.browser.CefFrame;
 import org.cef.callback.CefQueryCallback;
 import org.cef.handler.CefMessageRouterHandlerAdapter;
+
+/**
+ * @author The Chromium Embedded Framework Authors.
+ */
 
 public class MessageRouterHandler extends CefMessageRouterHandlerAdapter {
     @Override

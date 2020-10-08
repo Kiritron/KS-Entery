@@ -1,5 +1,18 @@
-// Copyright (c) 2014 The Chromium Embedded Framework Authors. All rights reserved.
-// Copyright (c) 2020 Киритрон Стэйблкор.
+/*
+ * Copyright 2020 Kiritron's Space
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 package space.kiritron.entery.core.handler;
 
@@ -9,6 +22,11 @@ import space.kiritron.entery.core.ui.ControlPanel;
 import space.kiritron.entery.init;
 
 import static space.kiritron.entery.core.MainFrame.tabManager;
+import static space.kiritron.entery.init.AddressFromArgs;
+
+/**
+ * @author Киритрон Стэйблкор and The Chromium Embedded Framework Authors.
+ */
 
 public class KeyboardHandler extends CefKeyboardHandlerAdapter {
     // Киритрон: Необходимые переменные для работы блоков, где комбинации горячих клавиш.
@@ -35,7 +53,11 @@ public class KeyboardHandler extends CefKeyboardHandlerAdapter {
                     // Открытие новой вкладки на CTRL + T
                     if (event.windows_key_code == 0x54) {
                         if (event.type == CefKeyEvent.EventType.KEYEVENT_RAWKEYDOWN) {
-                            tabManager.OpenTab(init.HomePage);
+                            if (AddressFromArgs == null) {
+                                tabManager.OpenTab(init.HomePage);
+                            } else {
+                                tabManager.OpenTab(init.AddressFromArgs);
+                            }
                             CTRL_DOWN = false;
                         }
                         return true;

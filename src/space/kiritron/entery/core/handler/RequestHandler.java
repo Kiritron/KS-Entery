@@ -1,5 +1,18 @@
-// Copyright (c) 2014 The Chromium Embedded Framework Authors. All rights reserved.
-// Copyright (c) 2020 Киритрон Стэйблкор.
+/*
+ * Copyright 2020 Kiritron's Space
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 package space.kiritron.entery.core.handler;
 
@@ -26,8 +39,13 @@ import javax.swing.SwingUtilities;
 
 import space.kiritron.entery.core.dialog.CertErrorDialog;
 import space.kiritron.entery.core.dialog.PasswordDialog;
+import space.kiritron.entery.core.modules.Entery_ClearWeb;
 import space.kiritron.entery.ks_libs.pixel.logger.genLogMessage;
 import space.kiritron.entery.ks_libs.pixel.logger.toConsole;
+
+/**
+ * @author Киритрон Стэйблкор and The Chromium Embedded Framework Authors.
+ */
 
 public class RequestHandler extends CefResourceRequestHandlerAdapter implements CefRequestHandler {
     private final Frame owner_;
@@ -75,12 +93,7 @@ public class RequestHandler extends CefResourceRequestHandlerAdapter implements 
 
     @Override
     public boolean onBeforeResourceLoad(CefBrowser browser, CefFrame frame, CefRequest request) {
-        // If you send a HTTP-POST request to https://duckduckgo.com//
-        // google rejects your request because they don't allow HTTP-POST.
-        //
-        // This test extracts the value of the test form.
-        // (see "Show Form" entry within BrowserMenuBar)
-        // and sends its value as HTTP-GET request to Google.
+        // Киритрон: Как я понял, это обработка перед загрузкой ресурсов с какого-то адреса.
         if (request.getMethod().equalsIgnoreCase("POST")
                 && request.getURL().equals("https://duckduckgo.com/")) {
             String forwardTo = "https://duckduckgo.com/?q=";
@@ -121,22 +134,29 @@ public class RequestHandler extends CefResourceRequestHandlerAdapter implements 
                 request.setHeaderMap(headerMap);
             }
         }
+
+        if (Entery_ClearWeb.checkRequest(request)) {
+            request.setURL("entery://res/blackhole");
+        }
+
         return false;
     }
 
     @Override
     public CefResourceHandler getResourceHandler(
             CefBrowser browser, CefFrame frame, CefRequest request) {
-        // the non existing domain "foo.bar" is handled by the ResourceHandler implementation
-        // E.g. if you try to load the URL http://www.foo.bar, you'll be forwarded
-        // to the ResourceHandler class.
+        // Киритрон: Тут может быть перехват запроса и последующая его обработка.
+        // Например, если запрос отправляется на http://www.foo.bar, то
+        // то будет возвращена пустая страница на entery://res/empty
         if (request.getURL().endsWith("foo.bar/")) {
-            return new ResourceHandler();
+            browser.stopLoad();
+            browser.loadURL("entery://res/empty");
+            return null;
         }
 
-        if (request.getURL().endsWith("seterror.test/")) {
-            return new ResourceSetErrorHandler();
-        }
+        //if (request.getURL().endsWith("foo.bar/")) {
+        //    return new ResourceSetErrorHandler();
+        //}
 
         return null;
     }

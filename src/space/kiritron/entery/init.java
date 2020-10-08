@@ -1,8 +1,25 @@
+/*
+ * Copyright 2020 Kiritron's Space
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package space.kiritron.entery;
 
 import com.formdev.flatlaf.FlatDarculaLaf;
 import com.formdev.flatlaf.FlatLightLaf;
 import space.kiritron.entery.core.MainFrame;
+import space.kiritron.entery.core.modules.Entery_ClearWeb;
 import space.kiritron.entery.ks_libs.duke.httpconn;
 import space.kiritron.entery.ks_libs.pixel.CheckerDIR;
 import space.kiritron.entery.ks_libs.pixel.GetOS;
@@ -19,24 +36,30 @@ import java.util.Locale;
 
 /**
  * @author Киритрон Стэйблкор
- * @version 2.0
  */
 
 public class init {
+    // TODO: фильтрация URL, список для блока из kiritron.space
+
     public final static String NAME_APP = "КС Энтери";
-    public final static String VER_APP = "Версия: 2.0-КСЭ Бета";
-    public final static String VER_APP_FILTERED = "2.0";
+    public final static String VER_APP = "Версия: 3.0-КСЭ Бета";
+    public final static String VER_APP_FILTERED = "3.0";
 
     public final static String pathOfEngineOptions = GetPathOfAPP.GetPathWithSep() + "cfg" + GetPathOfAPP.GetSep() + "engine-options.tolf";
     public final static String pathOfWindowOptions = GetPathOfAPP.GetPathWithSep() + "cfg" + GetPathOfAPP.GetSep() + "window-options.tolf";
+    public final static String pathOfClearWebOptions = GetPathOfAPP.GetPathWithSep() + "cfg" + GetPathOfAPP.GetSep() + "clearweb-options.tolf";
 
     public static String NAME_APP_USER_AGENT = initNameBrowser(true);
     public static String VER_APP_USER_AGENT = initNameBrowser(false);
 
     public static boolean outdated = false;
     public static boolean outdated_major = false;
+    public static boolean DarculaTheme;
+    public static boolean ClearWebStatus;
+    public static boolean ClearWebKSDBStatus;
     
-    public static String HomePage = "https://duckduckgo.com/";
+    public static final String HomePage = "https://duckduckgo.com/";
+    public static String AddressFromArgs = null;
 
     public static Image logo;
     public static ImageIcon addIcon;
@@ -71,12 +94,14 @@ public class init {
     public static ImageIcon menu_themeSelectIcon;
     public static ImageIcon menu_pluszoomIcon;
     public static ImageIcon menu_minuszoomIcon;
+    public static ImageIcon menu_homeIcon;
     public static ImageIcon pipIcon;
     public static ImageIcon refreshIcon;
     public static ImageIcon cross_refreshIcon;
     public static ImageIcon updateIcon;
     public static ImageIcon helpbookIcon;
     public static ImageIcon aboutIcon;
+    public static ImageIcon clearwebIcon;
 
     public static void main(String[] args) {
         if (!(args.length == 0)) {
@@ -84,6 +109,15 @@ public class init {
                 if (GetOS.isDogiru()) {
                     System.out.println(VER_APP_FILTERED);
                     System.exit(0);
+                }
+            }
+
+            if (args[0].contains("--open-address=")) {
+                args[0] = args[0].replace("--open-address=", "");
+                if (!args[0].contains("--open-address=")) {
+                    if (!args[0].isEmpty()) {
+                        AddressFromArgs = args[0];
+                    }
                 }
             }
         }
@@ -100,6 +134,13 @@ public class init {
         CheckerDIR.Check("cache");
         CheckerDIR.Check("res");
         CheckerDIR.Check("lang");
+        CheckerDIR.Check("userdata");
+
+        // Данный блок создан лишь для совместимости со старыми версиями приложения,
+        // в которых закладки хранились по другому адресу.
+        if (FileControls.SearchFile(GetPathOfAPP.GetPathWithSep() + "cfg" + GetPathOfAPP.GetSep() + "bookmarks.data")) {
+            FileControls.movingFile(GetPathOfAPP.GetPathWithSep() + "cfg" + GetPathOfAPP.GetSep() + "bookmarks.data", GetPathOfAPP.GetPathWithSep() + "userdata");
+        }
 
         genCfg();
 
@@ -107,7 +148,6 @@ public class init {
         boolean transparentPaintingEnabledArg = false; // Киритрон: Функция принудительно отключена. Пока не нужна.
         boolean createImmediately = false; // Киритрон: Функция принудительно отключена. Пока не нужна.
         boolean enableMediaStream;
-        boolean DarculaTheme;
         try {
             //if (TOLF_Handler.ReadParamFromData(FileControls.ReadFile(pathOfEngineOptions), "ENGINE-OPTIONS", "off-screen-rendering-enabled").equals("true")) {
             //    osrEnabledArg = true; } else { osrEnabledArg = false; }
@@ -119,13 +159,22 @@ public class init {
                 enableMediaStream = true; } else { enableMediaStream = false; }
             if (TOLF_Handler.ReadParamFromData(FileControls.ReadFile(pathOfWindowOptions), "WINDOW-OPTIONS", "theme").equals("dark")) {
                 DarculaTheme = true; } else { DarculaTheme = false; }
+            if (TOLF_Handler.ReadParamFromData(FileControls.ReadFile(pathOfClearWebOptions), "CLEARWEB-OPTIONS", "enabled").equals("true")) {
+                ClearWebStatus = true; } else { ClearWebStatus = false; }
+            if (TOLF_Handler.ReadParamFromData(FileControls.ReadFile(pathOfClearWebOptions), "CLEARWEB-OPTIONS", "ks-database").equals("true")) {
+                ClearWebKSDBStatus = true; } else { ClearWebKSDBStatus = false; }
         } catch (IOException e) {
             //osrEnabledArg = false;
             //transparentPaintingEnabledArg = false;
             //createImmediately = false;
             enableMediaStream = false;
             DarculaTheme = false;
+            ClearWebStatus = true;
             toConsole.print(genLogMessage.gen((byte) 3, false, "Не удалось прочитать файл конфигурации движка. Используются значения по умолчанию."));
+        }
+
+        if (ClearWebStatus) {
+            Entery_ClearWeb.init_signatures();
         }
 
         String colorTheme;
@@ -185,12 +234,14 @@ public class init {
         menu_themeSelectIcon = new ImageIcon(init.class.getResource("res/" + colorTheme + "/menu-selecttheme.png"));
         menu_pluszoomIcon = new ImageIcon(init.class.getResource("res/" + colorTheme + "/menu-pluszoom.png"));
         menu_minuszoomIcon = new ImageIcon(init.class.getResource("res/" + colorTheme + "/menu-minuszoom.png"));
+        menu_homeIcon = new ImageIcon(init.class.getResource("res/" + colorTheme + "/menu-home.png"));
         pipIcon = new ImageIcon(init.class.getResource("res/" + colorTheme + "/pip.png"));
         refreshIcon = new ImageIcon(init.class.getResource("res/" + colorTheme + "/refresh.png"));
         cross_refreshIcon = new ImageIcon(init.class.getResource("res/" + colorTheme + "/refresh-cross.png"));
         updateIcon = new ImageIcon(init.class.getResource("res/" + colorTheme + "/update.png"));
         helpbookIcon = new ImageIcon(init.class.getResource("res/" + colorTheme + "/helpbook.png"));
         aboutIcon = new ImageIcon(init.class.getResource("res/" + colorTheme + "/about.png"));
+        clearwebIcon = new ImageIcon(init.class.getResource("res/" + colorTheme + "/clearweb.png"));
         colorTheme = null;
 
         String checkVersionOut = httpconn.checkVersion("https://kiritron.space/versions/entery",false, true, VER_APP_FILTERED);
@@ -207,6 +258,14 @@ public class init {
 
         if (FileControls.SearchFile(GetPathOfAPP.GetPathWithSep() + "cache" + GetPathOfAPP.GetSep() + "Visited Links")) {
             FileControls.DeleteFile(GetPathOfAPP.GetPathWithSep() + "cache" + GetPathOfAPP.GetSep() + "Visited Links");
+        }
+
+        if (FileControls.SearchFile(GetPathOfAPP.GetPathWithSep() + "userdata" + GetPathOfAPP.GetSep() + "homepage")) {
+            try {
+                AddressFromArgs = FileControls.ReadFile(GetPathOfAPP.GetPathWithSep() + "userdata" + GetPathOfAPP.GetSep() + "homepage");
+            } catch (IOException EEE) {
+                // Ничего
+            }
         }
 
         new MainFrame(osrEnabledArg, transparentPaintingEnabledArg, createImmediately, null, param).start(osrEnabledArg, transparentPaintingEnabledArg, createImmediately, null, param);
@@ -272,6 +331,36 @@ public class init {
                                 + "\t\t- fullscreen: false;\n"
                                 + "\t\t- theme: dark;\n"
                                 + "\t[/WINDOW-OPTIONS]\n"
+                                + "/>");
+            } catch (IOException e) {
+                toConsole.print(genLogMessage.gen((byte) 3, false, "Не удалось создать файл конфигурации."));
+            }
+        }
+        if (FileControls.SearchFile(pathOfWindowOptions) == false) {
+            try {
+                FileControls.CreateFile(pathOfWindowOptions);
+                FileControls.writeToFile(pathOfWindowOptions,
+                        "</\n"
+                                + "\t[WINDOW-OPTIONS]\n"
+                                + "\t\t- width: 1278;\n"
+                                + "\t\t- height: 728;\n"
+                                + "\t\t- fullscreen: false;\n"
+                                + "\t\t- theme: dark;\n"
+                                + "\t[/WINDOW-OPTIONS]\n"
+                                + "/>");
+            } catch (IOException e) {
+                toConsole.print(genLogMessage.gen((byte) 3, false, "Не удалось создать файл конфигурации."));
+            }
+        }
+        if (FileControls.SearchFile(pathOfClearWebOptions) == false) {
+            try {
+                FileControls.CreateFile(pathOfClearWebOptions);
+                FileControls.writeToFile(pathOfClearWebOptions,
+                        "</\n"
+                                + "\t[CLEARWEB-OPTIONS]\n"
+                                + "\t\t- enabled: true;\n"
+                                + "\t\t- ks-database: false;\n"
+                                + "\t[/CLEARWEB-OPTIONS]\n"
                                 + "/>");
             } catch (IOException e) {
                 toConsole.print(genLogMessage.gen((byte) 3, false, "Не удалось создать файл конфигурации."));

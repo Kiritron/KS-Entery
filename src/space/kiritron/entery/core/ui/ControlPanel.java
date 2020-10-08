@@ -1,5 +1,18 @@
-// Copyright (c) 2014 The Chromium Embedded Framework Authors. All rights reserved.
-// Copyright (c) 2020 Киритрон Стэйблкор и Мистер Рекс.
+/*
+ * Copyright 2020 Kiritron's Space
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 package space.kiritron.entery.core.ui;
 
@@ -34,7 +47,7 @@ import org.cef.misc.CefPdfPrintSettings;
 import org.cef.network.CefCookieManager;
 
 import space.kiritron.entery.init;
-import space.kiritron.entery.core.Extensions;
+import space.kiritron.entery.core.modules.Extensions;
 import space.kiritron.entery.core.MainFrame;
 import space.kiritron.entery.core.dialog.CookieManagerDialog;
 import space.kiritron.entery.core.dialog.DevToolsDialog;
@@ -46,6 +59,10 @@ import space.kiritron.entery.ks_libs.pixel.filefunc.GetPathOfAPP;
 import space.kiritron.entery.ks_libs.pixel.logger.genLogMessage;
 import space.kiritron.entery.ks_libs.pixel.logger.toConsole;
 import space.kiritron.entery.ks_libs.tolchok.TOLF_Handler;
+
+/**
+ * @author Киритрон Стэйблкор, Мистер Рекс(MR.REX) и The Chromium Embedded Framework Authors.
+ */
 
 @SuppressWarnings("serial")
 public class ControlPanel extends JPanel {
@@ -74,6 +91,14 @@ public class ControlPanel extends JPanel {
     
     private final ImageIcon CanRefreshIcon = refreshIcon;
     private final ImageIcon CantRefreshIcon = cross_refreshIcon;
+
+    String status_reloadWithoutCache;
+    //String status_transparentPainting;
+    //String status_offrender;
+    String status_renameBrowser;
+    String status_mediaStream;
+    String selectedTheme;
+    String status_clearweb;
     
     class SaveAs implements CefStringVisitor {
         private PrintWriter fileWriter_;
@@ -101,12 +126,6 @@ public class ControlPanel extends JPanel {
         // НАЧАЛО БЛОКА - Инициализация статуса настроек
             // Киритрон: Вообще весь этот код был где-то посередине, но для того, чтобы привести всё в порядок, я решил его
             // переместить вот сюда. Проект увеличивается в плане кода, рассортировка участков необходима.
-            String status_reloadWithoutCache;
-            //String status_transparentPainting;
-            //String status_offrender;
-            String status_renameBrowser;
-            String status_mediaStream;
-            String selectedTheme;
 
             try {
                 if (TOLF_Handler.ReadParamFromData(FileControls.ReadFile(pathOfEngineOptions), "ENGINE-OPTIONS", "reloadWithoutCache").equals("true")) {
@@ -159,6 +178,14 @@ public class ControlPanel extends JPanel {
                     selectedTheme = " (Светлая)";
                 }
             } catch (IOException e) { selectedTheme = " (Тёмная)"; }
+
+            try {
+                if (TOLF_Handler.ReadParamFromData(FileControls.ReadFile(pathOfClearWebOptions), "CLEARWEB-OPTIONS", "enabled").equals("true")) {
+                    status_clearweb = " (Вкл.)";
+                } else {
+                    status_clearweb = " (Выкл.)";
+                }
+            } catch (IOException e) { status_clearweb = " (Выкл.)"; }
         // КОНЕЦ БЛОКА
 
         // НАЧАЛО БЛОКА - PopupMenu
@@ -185,6 +212,7 @@ public class ControlPanel extends JPanel {
             JMenuItem Util_SubMenuShowDevTools =            new JMenuItem           ("Инструменты разработчика");
                                                                                 // РАЗДЕЛИТЕЛЬ
             JMenu Settings_SubMenu =                        new JMenu           ("Настройки");
+            JMenuItem Settings_SebMenuHomePage =            new JMenuItem           ("Домашняя страница");
             JMenuItem Settings_SubMenuCookie =              new JMenuItem           ("Просмотр cookie-файлов");
                                                                                     // РАЗДЕЛИТЕЛЬ
             JMenuItem Settings_SubMenureloadWithoutCache =  new JMenuItem           ("Загрузка страниц без кеша" + status_reloadWithoutCache);
@@ -192,6 +220,8 @@ public class ControlPanel extends JPanel {
             //JMenuItem Settings_SubMenuoffrender =           new JMenuItem           ("Внеэкранный рендеринг" + status_offrender);
             JMenuItem Settings_SubMenurenameBrowser =       new JMenuItem           ("Маскировать браузер" + status_renameBrowser);
             JMenuItem Settings_SubMenumediaStream =         new JMenuItem           ("Потоковые данные WebRTC" + status_mediaStream);
+            JMenuItem Settings_SubMenuclearweb =            new JMenuItem           ("Энтэри ЧистыйВеб" + status_clearweb);
+                                                                                    // РАЗДЕЛИТЕЛЬ
             JMenuItem Settings_SubMenuselectTheme =         new JMenuItem           ("Тема оформления" + selectedTheme);
                                                                                     // РАЗДЕЛИТЕЛЬ
             JMenuItem Settings_SubMenuClearCache =          new JMenuItem           ("Удалить кеш браузера");
@@ -227,6 +257,7 @@ public class ControlPanel extends JPanel {
                 Util_SubMenu.add(Util_SubMenuShowDevTools);                         // Инструменты разработчика
             PopupMenu.addSeparator();                                           // РАЗДЕЛИТЕЛЬ
             PopupMenu.add(Settings_SubMenu);                                    // Настройки
+                Settings_SubMenu.add(Settings_SebMenuHomePage);                     // Домашняя страница
                 Settings_SubMenu.add(Settings_SubMenuCookie);                       // Просмотр cookie-файлов
                 Settings_SubMenu.addSeparator();                                    // РАЗДЕЛИТЕЛЬ
                 Settings_SubMenu.add(Settings_SubMenureloadWithoutCache);           // Перезагрузка без кеша
@@ -234,6 +265,7 @@ public class ControlPanel extends JPanel {
                 //Settings_SubMenu.add(Settings_SubMenuoffrender);                    // Внеэкранный рендеринг
                 Settings_SubMenu.add(Settings_SubMenurenameBrowser);                // Маскировка браузера
                 Settings_SubMenu.add(Settings_SubMenumediaStream);                  // Потоковые данные WebRTC
+                Settings_SubMenu.add(Settings_SubMenuclearweb);                     // Энтэри ЧистыйВеб
                 Settings_SubMenu.addSeparator();                                    // РАЗДЕЛИТЕЛЬ
                 Settings_SubMenu.add(Settings_SubMenuselectTheme);                  // Тема оформления
                 Settings_SubMenu.addSeparator();                                    // РАЗДЕЛИТЕЛЬ
@@ -278,12 +310,14 @@ public class ControlPanel extends JPanel {
                 Util_SubMenuCodeFromPage.setIcon(menu_writeIcon);
                 Util_SubMenuShowDevTools.setIcon(menu_toolIcon);
             Settings_SubMenu.setIcon(menu_settingsIcon);
+                Settings_SebMenuHomePage.setIcon(menu_homeIcon);
                 Settings_SubMenuCookie.setIcon(menu_cookieIcon);
                 Settings_SubMenureloadWithoutCache.setIcon(menu_settingsIcon);
                 //Settings_SubMenutransparentPainting.setIcon(menu_frameIcon);
                 //Settings_SubMenuoffrender.setIcon(menu_imageIcon);
                 Settings_SubMenurenameBrowser.setIcon(menu_maskIcon);
                 Settings_SubMenumediaStream.setIcon(menu_microphoneIcon);
+                Settings_SubMenuclearweb.setIcon(clearwebIcon);
                 Settings_SubMenuselectTheme.setIcon(menu_themeSelectIcon);
                 Settings_SubMenuClearCache.setIcon(menu_trashIcon);
                 Settings_SubMenuRecreateCFG.setIcon(menu_writeIcon);
@@ -362,7 +396,7 @@ public class ControlPanel extends JPanel {
                     int dialogResult = JOptionPane.showConfirmDialog(owner_, "Вы собираетесь удалить все закладки. Вы уверены?",
                             "Удаление всех закладок", JOptionPane.YES_NO_OPTION, JOptionPane.PLAIN_MESSAGE);
                     if (dialogResult == JOptionPane.YES_OPTION) {
-                        FileControls.DeleteFile(GetPathOfAPP.GetPathWithSep() + "cfg" + GetPathOfAPP.GetSep() + "bookmarks.data");
+                        FileControls.DeleteFile(GetPathOfAPP.GetPathWithSep() + "userdata" + GetPathOfAPP.GetSep() + "bookmarks.data");
                     }
                 }
             });
@@ -476,6 +510,45 @@ public class ControlPanel extends JPanel {
                 }
             });
 
+            Settings_SebMenuHomePage.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    Object[] options = { "Изменить ссылку домашней страницы", "Стандартная домашняя страница(DuckDuckGo)", "Отмена"};
+
+                    JPanel panel = new JPanel();
+                    JTextField custom_home_page = new JTextField();
+                    panel.add(new JLabel("Введите URL адрес домашней страницы"));
+                    panel.add(custom_home_page);
+
+                    if (AddressFromArgs == null) {
+                        custom_home_page.setText(init.HomePage);
+                    } else {
+                        custom_home_page.setText(init.AddressFromArgs);
+                    }
+
+                    int dialogResult = JOptionPane.showOptionDialog(owner_, panel,
+                            "Домашняя страница", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE,
+                            null, options, options[1]);
+                    if (dialogResult == JOptionPane.YES_OPTION) {
+                        AddressFromArgs = custom_home_page.getText();
+                        try {
+                            if (!FileControls.SearchFile(GetPathOfAPP.GetPathWithSep() + "userdata" + GetPathOfAPP.GetSep() + "homepage")) {
+                                FileControls.CreateFile(GetPathOfAPP.GetPathWithSep() + "userdata" + GetPathOfAPP.GetSep() + "homepage");
+                            }
+
+                            FileControls.writeToFile(GetPathOfAPP.GetPathWithSep() + "userdata" + GetPathOfAPP.GetSep() + "homepage",
+                                    custom_home_page.getText());
+                        } catch (IOException EeEeE) {
+                            // Ничего
+                        }
+                    } else if (dialogResult == JOptionPane.NO_OPTION) {
+                        AddressFromArgs = null;
+                        if (FileControls.SearchFile(GetPathOfAPP.GetPathWithSep() + "userdata" + GetPathOfAPP.GetSep() + "homepage")) {
+                            FileControls.DeleteFile(GetPathOfAPP.GetPathWithSep() + "userdata" + GetPathOfAPP.GetSep() + "homepage");
+                        }
+                    }
+                }
+            });
+
             Settings_SubMenuCookie.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     CookieManagerDialog cookieManager =
@@ -484,12 +557,11 @@ public class ControlPanel extends JPanel {
                 }
             });
 
-            final String[] finalStatus_reloadWithoutCache = {status_reloadWithoutCache};
             Settings_SubMenureloadWithoutCache.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     String stringOnOff;
-                    if (finalStatus_reloadWithoutCache[0].equals(" (Выкл.)")) {
+                    if (status_reloadWithoutCache.equals(" (Выкл.)")) {
                         stringOnOff = "Включить";
                     } else {
                         stringOnOff = "Выключить";
@@ -514,11 +586,11 @@ public class ControlPanel extends JPanel {
                             if (dialogResult == JOptionPane.YES_OPTION) {
                                 if (stringOnOff.equals("Включить")) {
                                     option = TOLF_Handler.EditParamInData(option, "ENGINE-OPTIONS", "reloadWithoutCache", "true");
-                                    finalStatus_reloadWithoutCache[0] = " (Вкл.)";
-                                    Settings_SubMenureloadWithoutCache.setText("Перезагрузка страницы без кеша" + finalStatus_reloadWithoutCache[0]);
+                                    status_reloadWithoutCache = " (Вкл.)";
+                                    Settings_SubMenureloadWithoutCache.setText("Перезагрузка страницы без кеша" + status_reloadWithoutCache);
                                 } else {
                                     option = TOLF_Handler.EditParamInData(option, "ENGINE-OPTIONS", "reloadWithoutCache", "false");
-                                    finalStatus_reloadWithoutCache[0] = " (Выкл.)";
+                                    status_reloadWithoutCache = " (Выкл.)";
                                     Settings_SubMenureloadWithoutCache.setText("Перезагрузка страницы без кеша" + Settings_SubMenureloadWithoutCache);
                                 }
                             }
@@ -633,13 +705,12 @@ public class ControlPanel extends JPanel {
 
              */
 
-            String finalStatus_renameBrowser = status_renameBrowser;
             Settings_SubMenurenameBrowser.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     String stringOnOff;
 
-                    if (finalStatus_renameBrowser.equals(" (Выкл.)")) {
+                    if (status_renameBrowser.equals(" (Выкл.)")) {
                         stringOnOff = "Включить";
                     } else {
                         stringOnOff = "Выключить";
@@ -683,13 +754,12 @@ public class ControlPanel extends JPanel {
                 }
             });
 
-            String finalStatus_mediaStream = status_mediaStream;
             Settings_SubMenumediaStream.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     String stringOnOff;
 
-                    if (finalStatus_mediaStream.equals(" (Выкл.)")) {
+                    if (status_mediaStream.equals(" (Выкл.)")) {
                         stringOnOff = "Разрешить";
                     } else {
                         stringOnOff = "Запретить";
@@ -733,6 +803,82 @@ public class ControlPanel extends JPanel {
                                 // Ничего не происходит
                             }
                         }
+                    }
+                }
+            });
+
+            Settings_SubMenuclearweb.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    Object[] options = {"Включить", "Выключить", "Отмена"};
+
+                    JPanel panel = new JPanel(new BorderLayout());
+                    JCheckBox ksDB = new JCheckBox("<html>Использовать сигнатуры из базы данных КС<br>(Может увеличиться время загрузки страниц)</html>");
+
+                    if (ClearWebKSDBStatus) {
+                        ksDB.setSelected(true);
+                    } else {
+                        ksDB.setSelected(false);
+                    }
+
+                    panel.add(new JLabel("<html><center>Данный модуль содержит блокировщик рекламы и аналитики.<br>" +
+                            "Модуль на стадии тестирования, но с блокировкой рекламы уже<br>" +
+                            "справляется неплохо.<br><br>&nbsp;</center></html>"), BorderLayout.PAGE_START);
+                    panel.add(ksDB, BorderLayout.CENTER);
+
+                    int dialogResult = JOptionPane.showOptionDialog(owner_, panel,
+                            "Энтэри ЧистыйВеб", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE,
+                            null, options, options[0]);
+                    if (dialogResult == JOptionPane.YES_OPTION) {
+                        ClearWebStatus = true;
+                        try {
+                            FileControls.writeToFile(pathOfClearWebOptions, TOLF_Handler.EditParamInData(FileControls.ReadFile(pathOfClearWebOptions), "CLEARWEB-OPTIONS", "enabled", "true"));
+                        } catch (IOException EeEeE) {
+                            // Ничего
+                        }
+                        if (ksDB.isSelected()) {
+                            ClearWebKSDBStatus = true;
+                            try {
+                                FileControls.writeToFile(pathOfClearWebOptions, TOLF_Handler.EditParamInData(FileControls.ReadFile(pathOfClearWebOptions), "CLEARWEB-OPTIONS", "ks-database", "true"));
+                            } catch (IOException EeEeE) {
+                                // Ничего
+                            }
+                        } else {
+                            ClearWebKSDBStatus = false;
+                            try {
+                                FileControls.writeToFile(pathOfClearWebOptions, TOLF_Handler.EditParamInData(FileControls.ReadFile(pathOfClearWebOptions), "CLEARWEB-OPTIONS", "ks-database", "false"));
+                            } catch (IOException EeEeE) {
+                                // Ничего
+                            }
+                        }
+
+                        status_clearweb = " (Вкл.)";
+                        Settings_SubMenuclearweb.setText("Энтэри ЧистыйВеб" + status_clearweb);
+                    } else if (dialogResult == JOptionPane.NO_OPTION) {
+                        ClearWebStatus = false;
+                        try {
+                            FileControls.writeToFile(pathOfClearWebOptions, TOLF_Handler.EditParamInData(FileControls.ReadFile(pathOfClearWebOptions), "CLEARWEB-OPTIONS", "enabled", "false"));
+                        } catch (IOException EeEeE) {
+                            // Ничего
+                        }
+                        if (ksDB.isSelected()) {
+                            ClearWebKSDBStatus = true;
+                            try {
+                                FileControls.writeToFile(pathOfClearWebOptions, TOLF_Handler.EditParamInData(FileControls.ReadFile(pathOfClearWebOptions), "CLEARWEB-OPTIONS", "ks-database", "true"));
+                            } catch (IOException EeEeE) {
+                                // Ничего
+                            }
+                        } else {
+                            ClearWebKSDBStatus = false;
+                            try {
+                                FileControls.writeToFile(pathOfClearWebOptions, TOLF_Handler.EditParamInData(FileControls.ReadFile(pathOfClearWebOptions), "CLEARWEB-OPTIONS", "ks-database", "false"));
+                            } catch (IOException EeEeE) {
+                                // Ничего
+                            }
+                        }
+
+                        status_clearweb = " (Выкл.)";
+                        Settings_SubMenuclearweb.setText("Энтэри ЧистыйВеб" + status_clearweb);
                     }
                 }
             });
@@ -896,7 +1042,11 @@ public class ControlPanel extends JPanel {
         homeButton_.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                browser_.loadURL(HomePage);
+                if (AddressFromArgs == null) {
+                    tabManager.OpenTab(init.HomePage);
+                } else {
+                    tabManager.OpenTab(init.AddressFromArgs);
+                }
             }
         });
         add(homeButton_);

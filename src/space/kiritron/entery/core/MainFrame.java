@@ -1,12 +1,24 @@
-// Copyright (c) 2013 The Chromium Embedded Framework Authors. All rights reserved.
-// Copyright (c) 2020 Киритрон Стэйблкор.
+/*
+ * Copyright 2020 Kiritron's Space
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 package space.kiritron.entery.core;
 
 import java.awt.*;
 import java.awt.event.*;
 import java.io.IOException;
-import java.util.ArrayList;
 
 import javax.swing.*;
 
@@ -22,7 +34,6 @@ import org.cef.handler.CefFocusHandlerAdapter;
 import org.cef.handler.CefLoadHandlerAdapter;
 import org.cef.network.CefCookieManager;
 
-import space.kiritron.entery.core.ui.TabComponent;
 import space.kiritron.entery.init;
 import space.kiritron.entery.core.dialog.DownloadDialog;
 import space.kiritron.entery.core.dialog.WelcomeWindow;
@@ -37,14 +48,18 @@ import space.kiritron.entery.core.handler.RequestHandler;
 import space.kiritron.entery.core.ui.ControlPanel;
 import space.kiritron.entery.core.ui.TabManager;
 import space.kiritron.entery.core.util.DataUri;
+import space.kiritron.entery.ks_libs.pixel.GetOS;
 import space.kiritron.entery.ks_libs.pixel.filefunc.FileControls;
 import space.kiritron.entery.ks_libs.pixel.filefunc.GetPathOfAPP;
 import space.kiritron.entery.ks_libs.pixel.logger.genLogMessage;
 import space.kiritron.entery.ks_libs.pixel.logger.toConsole;
 import space.kiritron.entery.ks_libs.tolchok.TOLF_Handler;
 
-import static space.kiritron.entery.init.outdated_major;
-import static space.kiritron.entery.init.pathOfEngineOptions;
+import static space.kiritron.entery.init.*;
+
+/**
+ * @author Киритрон Стэйблкор and The Chromium Embedded Framework Authors.
+ */
 
 public class MainFrame extends BrowserFrame {
     public static MainFrame frame = null;
@@ -280,20 +295,32 @@ public class MainFrame extends BrowserFrame {
                             canGoForward
                     );
                     //status_panel_.setIsInProgress(isLoading);
-
-                    if (!isLoading && !errorMsg_.isEmpty()) {
-                        browser.loadURL(DataUri.create("text/html", errorMsg_));
-                        errorMsg_ = "";
-                    }
                 }
 
                 @Override
                 public void onLoadError(CefBrowser browser, CefFrame frame, ErrorCode errorCode,
                         String errorText, String failedUrl) {
                     if (errorCode != ErrorCode.ERR_NONE && errorCode != ErrorCode.ERR_ABORTED) {
+                        String charset;
+                        String bg_color;
+                        String text_color;
+                        if (GetOS.isWindows()) {
+                            charset = "<meta charset=\"windows-1251\">";
+                        } else {
+                            charset = "<meta charset=\"UTF-8\">";
+                        }
+
+                        if (DarculaTheme) {
+                            bg_color = "212121";
+                            text_color = "DCDCDC";
+                        } else {
+                            bg_color = "DCDCDC";
+                            text_color = "212121";
+                        }
+
                         errorMsg_ = "<html><head>";
-                        errorMsg_ += "<meta charset=\"UTF-8\"><title>Ошибка при загрузке страницы</title>";
-                        errorMsg_ += "</head><body style='font-family: sans-serif; background-color: #212121; color: #DCDCDC;'>";
+                        errorMsg_ += charset + "<title>Ошибка при загрузке страницы</title>";
+                        errorMsg_ += "</head><body style='font-family: sans-serif; background-color: #" + bg_color + "; color: #" + text_color + ";'>";
                         errorMsg_ += "<center><div style='margin-top: 10%;'>";
                         errorMsg_ += "<h1>Сбой в загрузке страницы</h1>";
                         errorMsg_ += "<h3>Адрес страницы - " + failedUrl + "</h3>";
@@ -302,6 +329,12 @@ public class MainFrame extends BrowserFrame {
                         errorMsg_ += "</body></html>";
 
                         browser.stopLoad();
+
+                        browser.loadURL(DataUri.create("text/html", errorMsg_));
+                        errorMsg_ = "";
+                        charset = null;
+                        bg_color = null;
+                        text_color = null;
                     }
                 }
             });
@@ -353,7 +386,11 @@ public class MainFrame extends BrowserFrame {
 
             tabManager = new TabManager(this, contentPanel, browser, control_pane_, client_, osrEnabled, transparentPaintingEnabled, downloadDialog, CefCookieManager.getGlobalManager());
             //contentPanel.add(TabManager, BorderLayout.CENTER);
-            tabManager.OpenTab(init.HomePage);
+            if (AddressFromArgs == null) {
+                tabManager.OpenTab(init.HomePage);
+            } else {
+                tabManager.OpenTab(init.AddressFromArgs);
+            }
             
             // 2.1) We're overriding CefDisplayHandler as nested anonymous class
             //      to update our address-field, the title of the panel as well

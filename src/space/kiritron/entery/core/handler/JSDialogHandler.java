@@ -1,5 +1,4 @@
 // Copyright (c) 2014 The Chromium Embedded Framework Authors. All rights reserved.
-// Copyright (c) 2020 Киритрон Стэйблкор.
 
 package space.kiritron.entery.core.handler;
 
@@ -9,6 +8,10 @@ import org.cef.handler.CefJSDialogHandlerAdapter;
 import org.cef.misc.BoolRef;
 import space.kiritron.entery.ks_libs.pixel.logger.genLogMessage;
 import space.kiritron.entery.ks_libs.pixel.logger.toConsole;
+
+/**
+ * @author The Chromium Embedded Framework Authors.
+ */
 
 public class JSDialogHandler extends CefJSDialogHandlerAdapter {
     @Override

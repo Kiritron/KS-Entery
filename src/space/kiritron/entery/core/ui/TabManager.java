@@ -1,3 +1,19 @@
+/*
+ * Copyright 2020 Kiritron's Space
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package space.kiritron.entery.core.ui;
 
 import java.awt.BorderLayout;
@@ -19,9 +35,13 @@ import space.kiritron.entery.core.MainFrame;
 import space.kiritron.entery.core.dialog.DownloadDialog;
 
 import static space.kiritron.entery.core.MainFrame.tabManager;
+import static space.kiritron.entery.init.AddressFromArgs;
 import static space.kiritron.entery.init.addIcon;
 
-// Класс добавлен MR.REX для реализации системы вкладок
+/**
+ * @author Мистер Рекс(MR.REX) и Киритрон Стэйблкор
+ */
+
 public class TabManager extends JTabbedPane {
 	private JPanel Content;
 	private CefBrowser Browser;
@@ -74,7 +94,13 @@ public class TabManager extends JTabbedPane {
             public void stateChanged(ChangeEvent Event) {
             	JPanel TabPanel = (JPanel) ((JTabbedPane) Event.getSource()).getSelectedComponent();
                 SelectedTab = ((JTabbedPane) Event.getSource()).getSelectedIndex();
-                if (SelectedTab == Tabs.size() && !NewTabProcess) OpenTab(init.HomePage);
+                if (SelectedTab == Tabs.size() && !NewTabProcess) {
+					if (AddressFromArgs == null) {
+						tabManager.OpenTab(init.HomePage);
+					} else {
+						tabManager.OpenTab(init.AddressFromArgs);
+					}
+				}
                 if (TabPanel != null) {
                 	CefBrowser BrowserObject = Browsers.get(SelectedTab);
                 	//TabPanel.add(Control.ForBrowserObject(BrowserObject), BorderLayout.NORTH);

@@ -1,5 +1,18 @@
-// Copyright (c) 2014 The Chromium Embedded Framework Authors. All rights reserved.
-// Copyright (c) 2020 Киритрон Стэйблкор.
+/*
+ * Copyright 2020 Kiritron's Space
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 package space.kiritron.entery.core.handler;
 
@@ -16,7 +29,12 @@ import org.cef.network.CefResponse;
 import space.kiritron.entery.init;
 import space.kiritron.entery.ks_libs.pixel.GetOS;
 
+import static space.kiritron.entery.init.DarculaTheme;
 import static space.kiritron.entery.init.VER_APP;
+
+/**
+ * @author Киритрон Стэйблкор and The Chromium Embedded Framework Authors.
+ */
 
 public class ClientSchemeHandler extends CefResourceHandlerAdapter {
     public static final String scheme = "entery";
@@ -102,6 +120,12 @@ public class ClientSchemeHandler extends CefResourceHandlerAdapter {
                             "</center>" +
                         "</body>" +
                     "</html>";
+            data_ = html.getBytes();
+            handled = true;
+            mime_type_ = "text/html";
+        } else if (url.indexOf("blackhole") != -1) {
+            String html;
+            html = "";
             data_ = html.getBytes();
             handled = true;
             mime_type_ = "text/html";
@@ -192,6 +216,16 @@ public class ClientSchemeHandler extends CefResourceHandlerAdapter {
     }
 
     private String getDefaultBodyStyle() {
-        return "style='font-family: sans-serif; background-color: #212121; color: #DCDCDC;'";
+        String bg_color;
+        String text_color;
+        if (DarculaTheme) {
+            bg_color = "212121";
+            text_color = "DCDCDC";
+        } else {
+            bg_color = "DCDCDC";
+            text_color = "212121";
+        }
+
+        return "style='font-family: sans-serif; background-color: #" + bg_color + "; color: #" + text_color + ";'";
     }
 }
