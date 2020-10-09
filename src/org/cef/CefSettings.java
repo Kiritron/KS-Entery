@@ -4,7 +4,7 @@
 
 package org.cef;
 
-import space.kiritron.entery.ks_libs.pixel.filefunc.GetPathOfAPP;
+import space.kiritron.pixel.filefunc.GetPathOfAPP;
 
 import static space.kiritron.entery.init.*;
 

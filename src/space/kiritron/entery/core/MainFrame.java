@@ -48,12 +48,12 @@ import space.kiritron.entery.core.handler.RequestHandler;
 import space.kiritron.entery.core.ui.ControlPanel;
 import space.kiritron.entery.core.ui.TabManager;
 import space.kiritron.entery.core.util.DataUri;
-import space.kiritron.entery.ks_libs.pixel.GetOS;
-import space.kiritron.entery.ks_libs.pixel.filefunc.FileControls;
-import space.kiritron.entery.ks_libs.pixel.filefunc.GetPathOfAPP;
-import space.kiritron.entery.ks_libs.pixel.logger.genLogMessage;
-import space.kiritron.entery.ks_libs.pixel.logger.toConsole;
-import space.kiritron.entery.ks_libs.tolchok.TOLF_Handler;
+import space.kiritron.pixel.GetOS;
+import space.kiritron.pixel.filefunc.FileControls;
+import space.kiritron.pixel.filefunc.GetPathOfAPP;
+import space.kiritron.pixel.logger.genLogMessage;
+import space.kiritron.pixel.logger.toConsole;
+import space.kiritron.tolchok.TOLF_Handler;
 
 import static space.kiritron.entery.init.*;
 

@@ -26,8 +26,8 @@ import org.cef.handler.CefAppHandlerAdapter;
 import org.cef.handler.CefResourceHandler;
 import org.cef.network.CefRequest;
 import space.kiritron.entery.core.MainFrame;
-import space.kiritron.entery.ks_libs.pixel.logger.genLogMessage;
-import space.kiritron.entery.ks_libs.pixel.logger.toConsole;
+import space.kiritron.pixel.logger.genLogMessage;
+import space.kiritron.pixel.logger.toConsole;
 
 /**
  * @author Киритрон Стэйблкор and The Chromium Embedded Framework Authors.

@@ -40,8 +40,8 @@ import javax.swing.SwingUtilities;
 import space.kiritron.entery.core.dialog.CertErrorDialog;
 import space.kiritron.entery.core.dialog.PasswordDialog;
 import space.kiritron.entery.core.modules.Entery_ClearWeb;
-import space.kiritron.entery.ks_libs.pixel.logger.genLogMessage;
-import space.kiritron.entery.ks_libs.pixel.logger.toConsole;
+import space.kiritron.pixel.logger.genLogMessage;
+import space.kiritron.pixel.logger.toConsole;
 
 /**
  * @author Киритрон Стэйблкор and The Chromium Embedded Framework Authors.

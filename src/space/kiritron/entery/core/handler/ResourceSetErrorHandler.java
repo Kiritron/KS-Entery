@@ -23,8 +23,8 @@ import org.cef.misc.IntRef;
 import org.cef.misc.StringRef;
 import org.cef.network.CefRequest;
 import org.cef.network.CefResponse;
-import space.kiritron.entery.ks_libs.pixel.logger.genLogMessage;
-import space.kiritron.entery.ks_libs.pixel.logger.toConsole;
+import space.kiritron.pixel.logger.genLogMessage;
+import space.kiritron.pixel.logger.toConsole;
 
 /**
  * @author Киритрон Стэйблкор and The Chromium Embedded Framework Authors.

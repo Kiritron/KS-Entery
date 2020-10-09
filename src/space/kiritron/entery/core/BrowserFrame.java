@@ -22,8 +22,8 @@ import javax.swing.SwingUtilities;
 import org.cef.CefApp;
 import org.cef.browser.CefBrowser;
 import org.cef.handler.CefLifeSpanHandlerAdapter;
-import space.kiritron.entery.ks_libs.pixel.logger.genLogMessage;
-import space.kiritron.entery.ks_libs.pixel.logger.toConsole;
+import space.kiritron.pixel.logger.genLogMessage;
+import space.kiritron.pixel.logger.toConsole;
 
 /**
  * @author Киритрон Стэйблкор and The Chromium Embedded Framework Authors.

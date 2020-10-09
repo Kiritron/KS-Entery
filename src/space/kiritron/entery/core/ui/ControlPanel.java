@@ -53,12 +53,12 @@ import space.kiritron.entery.core.dialog.CookieManagerDialog;
 import space.kiritron.entery.core.dialog.DevToolsDialog;
 import space.kiritron.entery.core.dialog.DownloadDialog;
 import space.kiritron.entery.core.dialog.ShowTextDialog;
-import space.kiritron.entery.ks_libs.pixel.filefunc.DirControls;
-import space.kiritron.entery.ks_libs.pixel.filefunc.FileControls;
-import space.kiritron.entery.ks_libs.pixel.filefunc.GetPathOfAPP;
-import space.kiritron.entery.ks_libs.pixel.logger.genLogMessage;
-import space.kiritron.entery.ks_libs.pixel.logger.toConsole;
-import space.kiritron.entery.ks_libs.tolchok.TOLF_Handler;
+import space.kiritron.pixel.filefunc.DirControls;
+import space.kiritron.pixel.filefunc.FileControls;
+import space.kiritron.pixel.filefunc.GetPathOfAPP;
+import space.kiritron.pixel.logger.genLogMessage;
+import space.kiritron.pixel.logger.toConsole;
+import space.kiritron.tolchok.TOLF_Handler;
 
 /**
  * @author Киритрон Стэйблкор, Мистер Рекс(MR.REX) и The Chromium Embedded Framework Authors.

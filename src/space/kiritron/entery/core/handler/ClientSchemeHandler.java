@@ -27,7 +27,7 @@ import org.cef.misc.StringRef;
 import org.cef.network.CefRequest;
 import org.cef.network.CefResponse;
 import space.kiritron.entery.init;
-import space.kiritron.entery.ks_libs.pixel.GetOS;
+import space.kiritron.pixel.GetOS;
 
 import static space.kiritron.entery.init.DarculaTheme;
 import static space.kiritron.entery.init.VER_APP;

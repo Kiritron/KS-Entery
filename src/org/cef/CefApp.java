@@ -7,9 +7,9 @@ package org.cef;
 import org.cef.callback.CefSchemeHandlerFactory;
 import org.cef.handler.CefAppHandler;
 import org.cef.handler.CefAppHandlerAdapter;
-import space.kiritron.entery.ks_libs.pixel.filefunc.GetPathOfAPP;
-import space.kiritron.entery.ks_libs.pixel.logger.genLogMessage;
-import space.kiritron.entery.ks_libs.pixel.logger.toConsole;
+import space.kiritron.pixel.filefunc.GetPathOfAPP;
+import space.kiritron.pixel.logger.genLogMessage;
+import space.kiritron.pixel.logger.toConsole;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;

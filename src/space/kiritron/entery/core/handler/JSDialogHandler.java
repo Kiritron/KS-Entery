@@ -6,8 +6,8 @@ import org.cef.browser.CefBrowser;
 import org.cef.callback.CefJSDialogCallback;
 import org.cef.handler.CefJSDialogHandlerAdapter;
 import org.cef.misc.BoolRef;
-import space.kiritron.entery.ks_libs.pixel.logger.genLogMessage;
-import space.kiritron.entery.ks_libs.pixel.logger.toConsole;
+import space.kiritron.pixel.logger.genLogMessage;
+import space.kiritron.pixel.logger.toConsole;
 
 /**
  * @author The Chromium Embedded Framework Authors.
