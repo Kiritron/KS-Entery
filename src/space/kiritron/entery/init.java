@@ -39,8 +39,6 @@ import java.util.Locale;
  */
 
 public class init {
-    // TODO: фильтрация URL, список для блока из kiritron.space
-
     public final static String NAME_APP = "КС Энтери";
     public final static String VER_APP = "Версия: 3.0-КСЭ Бета";
     public final static String VER_APP_FILTERED = "3.0";
