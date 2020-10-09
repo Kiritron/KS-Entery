@@ -1,0 +1,9 @@
+// KS Pixel, KS Duke, KS Tolchok.
+// Copyright (c) 2020 Kiritron's Space
+
+// JCEF(Java CEF)
+// Copyright (c) 2008-2013 Marshall A. Greenblatt.
+// Copyright (c) 2006-2009 Google Inc. All rights reserved.
+
+Ешё используются библиотеки Jogl и Gluegen, но их лицензионные тексты очень объёмны
+и лежат в файлах jogl.LICENSE.txt и gluegen.LICENSE.txt соотвественно.
