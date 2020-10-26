@@ -40,8 +40,8 @@ import java.util.Locale;
 
 public class init {
     public final static String NAME_APP = "КС Энтери";
-    public final static String VER_APP = "Версия: 3.0-КСЭ Бета";
-    public final static String VER_APP_FILTERED = "3.0";
+    public final static String VER_APP = "Версия: 3.1-КСЭ Бета";
+    public final static String VER_APP_FILTERED = "3.1";
 
     public final static String pathOfEngineOptions = GetPathOfAPP.GetPathWithSep() + "cfg" + GetPathOfAPP.GetSep() + "engine-options.tolf";
     public final static String pathOfWindowOptions = GetPathOfAPP.GetPathWithSep() + "cfg" + GetPathOfAPP.GetSep() + "window-options.tolf";

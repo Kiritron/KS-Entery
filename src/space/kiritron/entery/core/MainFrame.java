@@ -67,7 +67,6 @@ public class MainFrame extends BrowserFrame {
 
     private static final long serialVersionUID = -2295538706810864538L;
     public void start(boolean osrEnabledArg, boolean transparentPaintingEnabledArg, boolean createImmediately, String link, String[] args) {
-        // Perform startup initialization on platforms that require it.
         if (!CefApp.startup(args)) {
             toConsole.print(genLogMessage.gen((byte) 1, false, "Сбой в инициализации движка."));
             return;
@@ -75,8 +74,6 @@ public class MainFrame extends BrowserFrame {
 
         toConsole.print(genLogMessage.gen((byte) 1, false, "Offscreen rendering " + (osrEnabledArg ? "enabled" : "disabled")));
 
-        // MainFrame keeps all the knowledge to display the embedded browser
-        // frame.
         frame = new MainFrame(osrEnabledArg, transparentPaintingEnabledArg, createImmediately, link, args);
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         int sizeWidth;
@@ -298,43 +295,74 @@ public class MainFrame extends BrowserFrame {
                 }
 
                 @Override
-                public void onLoadError(CefBrowser browser, CefFrame frame, ErrorCode errorCode,
-                        String errorText, String failedUrl) {
-                    if (errorCode != ErrorCode.ERR_NONE && errorCode != ErrorCode.ERR_ABORTED) {
-                        String charset;
-                        String bg_color;
-                        String text_color;
-                        if (GetOS.isWindows()) {
-                            charset = "<meta charset=\"windows-1251\">";
+                public void onLoadError(CefBrowser browser, CefFrame frame, ErrorCode errorCode, String errorText, String failedUrl) {
+                    boolean fakeAlert = true;
+                    String cacheFailedURL = null;
+                    String cacheURLfromAL = null;
+                    ControlPanel CP = tabManager.controlPanels.get(tabManager.getSelectedIndex() + 1);
+                    String urlFromAL = CP.getAddress();
+
+                    if (failedUrl.contains("http://")) {
+                        cacheFailedURL = failedUrl.substring(failedUrl.indexOf("http://"), failedUrl.indexOf("/"));
+                    } else if (failedUrl.contains("https://")) {
+                        cacheFailedURL = failedUrl.substring(failedUrl.indexOf("https://"), failedUrl.indexOf("/"));
+                    }
+
+                    if (urlFromAL.contains("http://")) {
+                        cacheURLfromAL = urlFromAL.substring(urlFromAL.indexOf("http://"), urlFromAL.indexOf("/"));
+                    } else if (urlFromAL.contains("https://")) {
+                        cacheURLfromAL = urlFromAL.substring(urlFromAL.indexOf("https://"), urlFromAL.indexOf("/"));
+                    }
+
+                    if (cacheFailedURL != null) {
+                        if (cacheFailedURL.equals(cacheURLfromAL)) {
+                            fakeAlert = false;
                         } else {
-                            charset = "<meta charset=\"UTF-8\">";
+                            fakeAlert = true; // Киритрон: Это на всякий случай... Это как нажимать CTRL + S по 100 раз при малейшем изменении.
                         }
+                    }
 
-                        if (DarculaTheme) {
-                            bg_color = "212121";
-                            text_color = "DCDCDC";
-                        } else {
-                            bg_color = "DCDCDC";
-                            text_color = "212121";
+                    if (fakeAlert == false) {
+                        if (errorCode != ErrorCode.ERR_NONE && errorCode != ErrorCode.ERR_ABORTED) {
+                            String charset;
+                            String bg_color;
+                            String text_color;
+                            if (GetOS.isWindows()) {
+                                charset = "<meta charset=\"windows-1251\">";
+                            } else {
+                                charset = "<meta charset=\"UTF-8\">";
+                            }
+
+                            if (DarculaTheme) {
+                                bg_color = "212121";
+                                text_color = "DCDCDC";
+                            } else {
+                                bg_color = "DCDCDC";
+                                text_color = "212121";
+                            }
+
+                            errorMsg_ = "<html><head>";
+                            errorMsg_ += charset + "<title>Ошибка при загрузке страницы</title>";
+                            errorMsg_ += "</head><body style='font-family: sans-serif; background-color: #" + bg_color + "; color: #" + text_color + ";'>";
+                            errorMsg_ += "<center><div style='margin-top: 10%;'>";
+                            errorMsg_ += "<h1>Сбой в загрузке страницы</h1>";
+                            errorMsg_ += "<h3>Адрес страницы - " + failedUrl + "</h3>";
+                            errorMsg_ += "<p>" + "Код ошибки: " + (errorText == null ? "" : errorText) + "</p>";
+                            errorMsg_ += "</div></center>";
+                            errorMsg_ += "</body></html>";
+
+                            browser.stopLoad();
+
+                            browser.loadURL(DataUri.create("text/html", errorMsg_));
+                            errorMsg_ = "";
+
+                            // Киритрон: Я не уверен, что это эффективно и скорее всего это просто лишнее действие
+                            charset = null;
+                            bg_color = null;
+                            text_color = null;
                         }
-
-                        errorMsg_ = "<html><head>";
-                        errorMsg_ += charset + "<title>Ошибка при загрузке страницы</title>";
-                        errorMsg_ += "</head><body style='font-family: sans-serif; background-color: #" + bg_color + "; color: #" + text_color + ";'>";
-                        errorMsg_ += "<center><div style='margin-top: 10%;'>";
-                        errorMsg_ += "<h1>Сбой в загрузке страницы</h1>";
-                        errorMsg_ += "<h3>Адрес страницы - " + failedUrl + "</h3>";
-                        errorMsg_ += "<p>" + "Код ошибки: " + (errorText == null ? "" : errorText) + "</p>";
-                        errorMsg_ += "</div></center>";
-                        errorMsg_ += "</body></html>";
-
-                        browser.stopLoad();
-
-                        browser.loadURL(DataUri.create("text/html", errorMsg_));
-                        errorMsg_ = "";
-                        charset = null;
-                        bg_color = null;
-                        text_color = null;
+                    } else {
+                        toConsole.print(genLogMessage.gen((byte) 3, false, "Сбой в загрузке побочной ссылки - " + failedUrl));
                     }
                 }
             });

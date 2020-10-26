@@ -38,16 +38,21 @@ import java.net.URLConnection;
  */
 
 public class Entery_ClearWeb {
+    // Киритрон: Некоторые сигнатуры отключены, так как они не работают
     private static String yandex_analytics, yandex_analytics2, yandex_advert, yandex_advert2,
-                          google_analytics_sign1, google_analytics_sign2, google_analytics_sign3, google_advert, google_advert2,
-                          sentry_bugtracker1, sentry_bugtracker2,
-                          bugsnag_bugtracker,
-                          hotjar_analytics,
-                          banner, flash, advert1, advert2,
+                          google_analytics_sign1, google_analytics_sign2, google_analytics_sign3, google_analytics_sign4, google_advert, google_advert2,
+                          //sentry_bugtracker1, sentry_bugtracker2,
+                          //bugsnag_bugtracker,
+                          //hotjar_analytics,
+                          banner, flash, advert1, advert2, advert3, advert4,
                           mailru_analytics, mailru_analytics2, mailru_advert,
                           tns_counter,
                           twitter_analytics,
-                          adtng_advert;
+                          adtng_advert,
+                          wiki_analytics,
+                          amazon_ad,
+                          fandom_analytcs,
+                          other_analytics1, other_analytics2;
 
     public static void init_signatures() {
         yandex_analytics = "mc.yandex.ru/metrika/";                       // Яндекс.Метрика
@@ -58,28 +63,39 @@ public class Entery_ClearWeb {
         google_analytics_sign1 = "google-analytics.com/ga.js";            // Google Аналитика
         google_analytics_sign2 = "google-analytics.com/analytics.js";     // Google Аналитика
         google_analytics_sign3 = "google-analytics.com/dc.js";            // Google Аналитика
+        google_analytics_sign4 = "googletagservices.com/tag/";            // Google Аналитика
         google_advert = "googlesyndication.com";                          // Google Реклама
         google_advert2 = "googleads";                                     // Google Реклама
 
-        hotjar_analytics = "static.hotjar.com";                           // HotJar Аналитика
+        //hotjar_analytics = "static.hotjar.com";                         // HotJar Аналитика
 
         banner = "banner";                                                // Сигнатура обыкновенного баннера
 
         flash = ".swf";                                                   // Сигнатура файла флеш плеера | Киритрон: По сути в Энтэри и так флеш не работает, но всё равно лучше такое блочить
 
         advert1 = "advert";                                               // Сигнатура рекламы
-
         advert2 = "/ads/";                                                // Сигнатура рекламы
+        advert3 = "a.ad.gt";                                              // Сигнатура рекламы
+        advert4 = "seg.ad.gt";                                            // Сигнатура рекламы
 
         mailru_analytics = "top-fwz1.mail.ru";                            // MAIL.RU Аналитика
-        mailru_analytics2 = "https://r0.mail.ru/pixel/";                   // MAIL.RU Аналитика
-        mailru_advert = "ad.mail.ru/static/";
+        mailru_analytics2 = "https://r0.mail.ru/pixel/";                  // MAIL.RU Аналитика
+        mailru_advert = "ad.mail.ru/static/";                             // MAIL.RU Реклама
 
         tns_counter = "tns-counter.ru";                                   // tns-counter Счётчик
 
         twitter_analytics = "syndication.twitter.com";                    // Twitter трекер
 
         adtng_advert = "adtng.";                                          // Рекламная сеть
+
+        wiki_analytics = "beacon.wikia-services.com/__track/";            // Аналитика Wikia
+
+        other_analytics1 = "sb.scorecardresearch.com/beacon.js";
+        other_analytics2 = "secure.quantserve.com/quant.js";
+
+        amazon_ad = "amazon-adsystem.com";
+
+        fandom_analytcs = "services.fandom.com/ad-tag-manager/";
     }
 
     // Киритрон: Возвращает TRUE, если есть совпадение с базой сигнатур.
@@ -89,16 +105,20 @@ public class Entery_ClearWeb {
             if (request_url != null && !request_url.isEmpty()) {
                 if (request_url.contains(yandex_analytics) || request_url.contains(yandex_analytics2) || request_url.contains(yandex_advert) || request_url.contains(yandex_advert2)) { return true; }
                 if (request_url.contains(google_analytics_sign1) || request_url.contains(google_analytics_sign2) || request_url.contains(google_analytics_sign3) ||
-                        request_url.contains(google_advert) || request_url.contains(google_advert2)) { return true; }
+                        request_url.contains(google_advert) || request_url.contains(google_advert2) || request_url.contains(google_analytics_sign4)) { return true; }
                 //if (request_url.contains(sentry_bugtracker1) || request_url.contains(sentry_bugtracker2)) { return true; }
                 //if (request_url.contains(bugsnag_bugtracker)) { return true; }
                 if (request_url.contains(banner)) { return true; }
                 if (request_url.contains(flash)) { return true; }
-                if (request_url.contains(advert1) || request_url.contains(advert2)) { return true; }
+                if (request_url.contains(advert1) || request_url.contains(advert2) || request_url.contains(advert3) || request_url.contains(advert4)) { return true; }
                 if (request_url.contains(mailru_analytics) || request_url.contains(mailru_analytics2) || request_url.contains(mailru_advert)) { return true; }
                 if (request_url.contains(tns_counter)) { return true; }
                 if (request_url.contains(twitter_analytics)) { return true; }
                 if (request_url.contains(adtng_advert)) { return true; }
+                if (request_url.contains(amazon_ad)) { return true; }
+                if (request_url.contains(fandom_analytcs)) { return true; }
+                if (request_url.contains(wiki_analytics)) { return true; }
+                if (request_url.contains(other_analytics1) || request_url.contains(other_analytics2)) { return true; }
             }
 
             if (init.ClearWebKSDBStatus) {
